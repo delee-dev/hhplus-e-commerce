@@ -1,13 +1,6 @@
-## 프로젝트
+# 이커머스 시스템 구축
 
-## Getting Started
-
-### Prerequisites
-
-#### Running Docker Containers
-
-`local` profile 로 실행하기 위하여 인프라가 설정되어 있는 Docker 컨테이너를 실행해주셔야 합니다.
-
-```bash
-docker-compose up -d
-```
+## Docs
+- [마일스톤](docs/0.%20마일스톤/README)
+- [요구사항 분석](docs/1.%20요구사항/요구사항%20분석.md)
+- [API별 다이어그램](docs/2.%20다이어그램/README.md)

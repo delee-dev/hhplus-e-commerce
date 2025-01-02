@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.order.model;
 
 import jakarta.persistence.*;
-import kr.hhplus.be.server.domain.member.model.User;
+import kr.hhplus.be.server.domain.user.model.User;
 import kr.hhplus.be.server.global.model.BaseEntity;
 
 import java.util.List;

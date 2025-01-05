@@ -1,8 +1,6 @@
 package kr.hhplus.be.server.api.product.controller;
 
 import kr.hhplus.be.server.api.product.dto.ProductSummaryResponse;
-import kr.hhplus.be.server.api.product.dto.SortColumn;
-import kr.hhplus.be.server.api.product.dto.SortDirection;
 import kr.hhplus.be.server.domain.product.model.SaleStatus;
 import kr.hhplus.be.server.global.model.PageResponse;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +13,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/product")
-public class ProductController {
+public class ProductController implements ProductSwaggerApiSpec {
+    @Override
     @GetMapping(value = "/list")
     public ResponseEntity<PageResponse<ProductSummaryResponse>> getProductsByCategory(
             @RequestParam long categoryId,
             @RequestParam int page,
             @RequestParam int size,
-            @RequestParam(defaultValue = "CREATED_AT") SortColumn sort,
-            @RequestParam(defaultValue = "ASC") SortDirection direction
+            @RequestParam(defaultValue = "createdAt") String sort,
+            @RequestParam(defaultValue = "asc") String direction
     ) {
         if (categoryId == 9) {
             return ResponseEntity.ok(new PageResponse<>(List.of(), new PageResponse.PageInfo(0, 10, 0, 0)));
@@ -49,6 +48,7 @@ public class ProductController {
         ));
     }
 
+    @Override
     @GetMapping("/best")
     public ResponseEntity<List<ProductSummaryResponse>> getBestSellersByCategory(@RequestParam long categoryId) {
         return ResponseEntity.ok(List.of(

@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/point")
-public class PointController {
+public class PointController implements PointSwaggerApiSpec {
+    @Override
     @GetMapping
     public ResponseEntity<GetPointResponse> getPoint(@RequestParam long userId) {
         if (userId == 9) {
@@ -19,6 +20,7 @@ public class PointController {
         return ResponseEntity.ok(new GetPointResponse(userId, "홍길동", 10_000));
     }
 
+    @Override
     @PatchMapping("/charge")
     public ResponseEntity<ChargePointResponse> charge(@RequestBody ChargePointRequest request) {
         if (request.amount() < 1_000) {

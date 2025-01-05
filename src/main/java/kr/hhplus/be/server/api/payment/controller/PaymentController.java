@@ -18,7 +18,8 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/pay")
-public class PaymentController {
+public class PaymentController implements PaymentSwaggerApiSpec {
+    @Override
     @PatchMapping("/order")
     public ResponseEntity<PayToOrderResponse> payToOrder(@RequestBody PayToOrderRequest request) {
         // 결제 상태

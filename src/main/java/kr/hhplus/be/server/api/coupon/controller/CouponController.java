@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/coupon")
-public class CouponController {
+public class CouponController implements CouponSwaggerApiSpec {
+
+    @Override
     @PostMapping("/issue")
     public ResponseEntity<IssueCouponResponse> issue(@RequestBody IssueCouponRequest request) {
         if (request.userId() == 9) {

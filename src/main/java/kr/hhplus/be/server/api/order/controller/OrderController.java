@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/order")
-public class OrderController {
+public class OrderController implements OrderSwaggerApiSpec {
+
+    @Override
     @PostMapping
     public ResponseEntity<OrderResponse> order(@RequestBody OrderRequest request) {
         if (request.userId() == 9) {

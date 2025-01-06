@@ -3,7 +3,6 @@ package kr.hhplus.be.server.api.product.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,10 +25,7 @@ public interface ProductSwaggerApiSpec {
             responseCode = "200",
             description = "상품 리스트 조회 성공",
             content = @Content(
-                    schema = @Schema(
-                            implementation = PageResponse.class,
-                            subTypes = {ProductSummaryResponse.class}
-                    ),
+                    schema = @Schema(implementation = PageResponse.class),
                     examples = @ExampleObject(
                             value = """
                                 {
@@ -40,6 +36,8 @@ public interface ProductSwaggerApiSpec {
                                             "description": "반려동물 털 청소에 최적화된 신상 로봇청소기입니다",
                                             "category": "가전",
                                             "price": 399000,
+                                            "originalPrice": 599000,
+                                            "stock": 100,
                                             "status": "ON_SALE"
                                         },
                                         ...
@@ -72,7 +70,34 @@ public interface ProductSwaggerApiSpec {
             responseCode = "200",
             description = "상위 판매 상품(베스트 셀러) 조회 성공",
             content = @Content(
-                    array = @ArraySchema(schema = @Schema(implementation = ProductSummaryResponse.class))
+                    schema = @Schema(implementation = List.class),
+                    examples = @ExampleObject(
+                            value = """
+                                [
+                                    {
+                                        "userId": 1,
+                                        "name": "로봇청소기 Pro",
+                                        "description": "반려동물 털 청소에 최적화된 신상 로봇청소기입니다",
+                                        "category": "가전",
+                                        "price": 399000,
+                                        "originalPrice": 599000,
+                                        "stock": 100,
+                                        "status": "ON_SALE"
+                                    },
+                                    {
+                                        "userId": 2,
+                                        "name": "울트라 게이밍 마우스",
+                                        "description": "초고성능 게이밍 마우스",
+                                        "category": "PC주변기기",
+                                        "price": 89000,
+                                        "originalPrice": 129000,
+                                        "stock": 50,
+                                        "status": "ON_SALE"
+                                    },
+                                    ...
+                                ]
+                            """
+                    )
             ))
     @Parameter(name = "categoryId", required = true, description = "카테고리 ID")
     ResponseEntity<List<ProductSummaryResponse>> getBestSellersByCategory(long categoryId);

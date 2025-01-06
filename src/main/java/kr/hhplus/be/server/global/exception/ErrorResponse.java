@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.global.exception;
 
 public record ErrorResponse(
-        String code,
+        int status,
         String message
 ) {
 }

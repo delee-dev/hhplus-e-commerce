@@ -23,7 +23,9 @@ public class OrderController implements OrderSwaggerApiSpec {
         if (request.userId() == 9) {
             throw new DomainException(ProductErrorCode.PRODUCT_OUT_OF_STOCK);
         } else {
-            return ResponseEntity.ok(new OrderResponse(1, 1, OrderStatus.PAYMENT_PENDING, LocalDateTime.now()));
+            return ResponseEntity
+                    .status(201)
+                    .body(new OrderResponse(1, 1, OrderStatus.PAYMENT_PENDING, LocalDateTime.now()));
         }
     }
 }

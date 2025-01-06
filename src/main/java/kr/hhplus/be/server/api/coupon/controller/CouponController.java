@@ -24,7 +24,9 @@ public class CouponController implements CouponSwaggerApiSpec {
         } else if (request.userId() == 999) {
             throw new DomainException(CouponErrorCode.COUPON_ISSUE_IN_PROGRESS);
         } else {
-            return ResponseEntity.ok(new IssueCouponResponse(true));
+            return ResponseEntity
+                    .status(201)
+                    .body(new IssueCouponResponse(true));
         }
     }
 }

@@ -36,8 +36,6 @@ public interface ProductSwaggerApiSpec {
                                             "description": "반려동물 털 청소에 최적화된 신상 로봇청소기입니다",
                                             "category": "가전",
                                             "price": 399000,
-                                            "originalPrice": 599000,
-                                            "stock": 100,
                                             "status": "ON_SALE"
                                         },
                                         ...
@@ -80,8 +78,6 @@ public interface ProductSwaggerApiSpec {
                                         "description": "반려동물 털 청소에 최적화된 신상 로봇청소기입니다",
                                         "category": "가전",
                                         "price": 399000,
-                                        "originalPrice": 599000,
-                                        "stock": 100,
                                         "status": "ON_SALE"
                                     },
                                     {
@@ -90,8 +86,6 @@ public interface ProductSwaggerApiSpec {
                                         "description": "초고성능 게이밍 마우스",
                                         "category": "PC주변기기",
                                         "price": 89000,
-                                        "originalPrice": 129000,
-                                        "stock": 50,
                                         "status": "ON_SALE"
                                     },
                                     ...

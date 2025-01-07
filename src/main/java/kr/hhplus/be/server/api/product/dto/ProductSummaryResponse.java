@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.api.product.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.hhplus.be.server.domain.product.dto.ProductResult;
 import kr.hhplus.be.server.domain.product.model.SaleStatus;
 
 @Schema(description = "상품 조회 응답 DTO")
@@ -13,13 +14,19 @@ public record ProductSummaryResponse(
         String description,
         @Schema(description = "카테고리명", example = "가전")
         String category,
-        @Schema(description = "판매가", example = "399000")
+        @Schema(description = "가격", example = "399000")
         long price,
-        @Schema(description = "정가", example = "599000")
-        long originalPrice,
-        @Schema(description = "재고", example = "100")
-        int stock,
         @Schema(description = "상품 판매 상태", example = "ON_SALE")
         SaleStatus status
 ) {
+        public static ProductSummaryResponse fromDomain(ProductResult domainDto) {
+                return new ProductSummaryResponse(
+                        domainDto.id(),
+                        domainDto.name(),
+                        domainDto.description(),
+                        domainDto.category(),
+                        domainDto.price(),
+                        domainDto.status()
+                );
+        }
 }

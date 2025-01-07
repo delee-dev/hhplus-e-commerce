@@ -47,7 +47,20 @@ public interface PointSwaggerApiSpec {
             tags = {"Point API"}
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "충전 성공"),
+            @ApiResponse(responseCode = "200", description = "충전 성공", content = @Content(schema = @Schema(implementation = ChargePointResponse.class))),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "사용자를 찾을 수 없음",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                        {
+                                            "code": 404,
+                                            "message": "회원 정보를 찾을 수 없습니다."
+                                        }
+                                    """
+                            ))),
             @ApiResponse(
                     responseCode = "400",
                     description = "1회 최소 충전 금액 미달",
@@ -84,6 +97,19 @@ public interface PointSwaggerApiSpec {
                                         {
                                             "code": 400,
                                             "message": "포인트 보유 한도를 초과하였습니다."
+                                        }
+                                    """
+                            ))),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "다중 수정 요청으로 인한 충돌",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                        {
+                                            "code": 409,
+                                            "message": "데이터가 이미 변경되었습니다. 최신 데이터를 확인해주세요."
                                         }
                                     """
                             )))

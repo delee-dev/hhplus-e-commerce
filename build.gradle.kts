@@ -47,6 +47,8 @@ dependencies {
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:mysql")
 	testImplementation ("io.rest-assured:rest-assured")
+	testImplementation ("org.instancio:instancio-junit:5.2.1")
+	testImplementation ("org.instancio:instancio-core:5.2.1")
 
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 

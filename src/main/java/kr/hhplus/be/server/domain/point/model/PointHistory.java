@@ -3,11 +3,13 @@ package kr.hhplus.be.server.domain.point.model;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.global.model.BaseEntity;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "point_histories")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class PointHistory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,11 +4,24 @@ import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.coupon.CouponErrorCode;
 import kr.hhplus.be.server.global.exception.DomainException;
 import kr.hhplus.be.server.global.model.BaseEntity;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "issued_coupons")
+@Table(
+        name = "issued_coupons",
+        uniqueConstraints = {
+                @UniqueConstraint( // TODO: 위반 시, DomainException 으로 변환할 수 있는 방법
+                        name = "uk_issued_coupon_coupon_id_user_id",
+                        columnNames = {"coupon_id", "user_id"}
+                )
+        }
+)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class IssuedCoupon extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +35,12 @@ public class IssuedCoupon extends BaseEntity {
     @Column(nullable = false)
     private CouponStatus status;
     private LocalDateTime used_at;
+
+    public IssuedCoupon(Coupon coupon, Long userId) {
+        this.coupon = coupon;
+        this.userId = userId;
+        this.status = CouponStatus.AVAILABLE;
+    }
 
     public void validateApplicable(Long orderAmount) {
         validateNotUsedCoupon();

@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.coupon.CouponErrorCode;
 import kr.hhplus.be.server.global.exception.DomainException;
 import kr.hhplus.be.server.global.model.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -12,6 +14,7 @@ import java.util.Optional;
 @Entity
 @Table(name = "coupons")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Coupon extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +46,16 @@ public class Coupon extends BaseEntity {
         if (minOrderAmount != null && actualOrderAmount < minOrderAmount) {
             throw new DomainException(CouponErrorCode.COUPON_NOT_APPLICABLE_TO_PAYMENT);
         }
+    }
+
+    public void validateRemainingQuantity() {
+        if (totalQuantity <= 0) {
+            throw new DomainException(CouponErrorCode.COUPON_STOCK_DEPLETED);
+        }
+    }
+
+    public void decreaseQuantity() {
+        totalQuantity --;
     }
 
     public Long calculateDiscountAmount(Long actualOrderAmount) {

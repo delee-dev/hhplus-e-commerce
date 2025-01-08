@@ -23,6 +23,12 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private SaleStatus status;
 
+    public void updateSaleStatus(int currentStock) {
+        if (currentStock == 0) {
+            status = SaleStatus.TEMPORARILY_OUT;
+        }
+    }
+
     public String getCategoryName() {
         return category.getName();
     }

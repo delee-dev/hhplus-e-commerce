@@ -6,4 +6,5 @@ import kr.hhplus.be.server.global.model.PageResponse;
 
 public interface ProductRepository {
     PageResponse<Product> findProductsByCategoryIdAndStatusNot(long categoryId, SaleStatus status, int page, int size, String sortColumn, String sortDirection);
+    Product save(Product product);
 }

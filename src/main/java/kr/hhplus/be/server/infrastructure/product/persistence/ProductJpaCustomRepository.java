@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 public class ProductJpaCustomRepository implements ProductRepository {
     private final ProductJpaRepository productJpaRepository;
 
+    @Override
     public PageResponse<Product> findProductsByCategoryIdAndStatusNot(long categoryId, SaleStatus status, int page, int size, String sortColumn, String sortDirection) {
         PageRequest pageRequest = PageRequest
                 .of(page, size)
@@ -23,5 +24,10 @@ public class ProductJpaCustomRepository implements ProductRepository {
 
         PageResponse.PageInfo pageInfo = new PageResponse.PageInfo(page, size, productPage.getTotalElements(), productPage.getTotalPages());
         return new PageResponse<>(productPage.getContent(), pageInfo);
+    }
+
+    @Override
+    public Product save(Product product) {
+        return productJpaRepository.save(product);
     }
 }

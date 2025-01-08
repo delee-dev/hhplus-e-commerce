@@ -2,6 +2,8 @@ package kr.hhplus.be.server.api.order.dto;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.hhplus.be.server.application.order.dto.OrderCommand;
+import kr.hhplus.be.server.application.order.dto.OrderItemCommand;
 
 import java.util.List;
 
@@ -19,4 +21,9 @@ public record OrderRequest(
         @Schema(description = "배송지 주소", example = "서울특별시 강남구 강남대로 123")
         String shippingAddress
 ) {
+        public OrderCommand toApp() {
+                List<OrderItemCommand> orderItemCommands = orderItems.stream()
+                        .map(OrderItemRequest::toApp).toList();
+                return new OrderCommand(userId, orderItemCommands, receiverName, receiverPhone, shippingAddress);
+        }
 }

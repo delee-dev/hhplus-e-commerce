@@ -14,4 +14,9 @@ public class PaymentJpaCustomRepository implements PaymentRepository {
     public Payment save(Payment payment) {
         return paymentJpaRepository.save(payment);
     }
+
+    @Override
+    public Payment getPaymentByOrderIdWithLock(Long orderId) {
+        return paymentJpaRepository.findByOrderId(orderId);
+    }
 }

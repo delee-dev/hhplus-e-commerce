@@ -5,7 +5,6 @@ import kr.hhplus.be.server.global.model.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.util.List;
 
@@ -44,5 +43,9 @@ public class Order extends BaseEntity {
     public void changeOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
         this.totalAmount = orderItems.stream().mapToLong(OrderItem::calculateTotalAmount).sum();
+    }
+
+    public void completePayment() {
+        this.status = OrderStatus.PAYMENT_COMPLETED;
     }
 }

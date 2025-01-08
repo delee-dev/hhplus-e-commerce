@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.domain.payment.model;
 
 import jakarta.persistence.*;
+import kr.hhplus.be.server.domain.payment.PaymentErrorCode;
+import kr.hhplus.be.server.global.exception.DomainException;
 import kr.hhplus.be.server.global.model.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,5 +36,22 @@ public class Payment extends BaseEntity {
         this.discountAmount = 0L;
         this.finalAmount = totalAmount - discountAmount;
         this.status = PaymentStatus.PENDING;
+    }
+
+    public void validatePaymentEligibility() {
+        if (status == PaymentStatus.COMPLETED) {
+            throw new DomainException(PaymentErrorCode.PAYMENT_ALREADY_COMPLETED);
+        } else if (status == PaymentStatus.CANCELED) {
+            throw new DomainException(PaymentErrorCode.PAYMENT_ALREADY_CANCELLED);
+        }
+    }
+
+    public void applyDiscount(Long discountAmount) {
+        this.discountAmount = discountAmount;
+        this.finalAmount = totalAmount - discountAmount;
+    }
+
+    public void completePayment() {
+        this.status = PaymentStatus.COMPLETED;
     }
 }

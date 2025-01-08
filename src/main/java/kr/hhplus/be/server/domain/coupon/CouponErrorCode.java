@@ -11,7 +11,8 @@ public enum CouponErrorCode implements ErrorCode {
     COUPON_EXPIRED(400, "만료된 쿠폰입니다."),
     COUPON_INVALID(409, "유효하지 않은 쿠폰입니다."),
     COUPON_ALREADY_USED(400, "이미 사용된 쿠폰입니다."),
-    COUPON_NOT_APPLICABLE_TO_PAYMENT(400, "해당 결제에 적용 불가능한 쿠폰 입니다.");
+    COUPON_NOT_APPLICABLE_TO_PAYMENT(400, "해당 결제에 적용 불가능한 쿠폰 입니다."),
+    COUPON_NOT_FOUND(404, "존재하지 않는 쿠폰입니다.");
 
     private int status;
     private String message;

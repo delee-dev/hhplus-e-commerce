@@ -3,6 +3,7 @@ package kr.hhplus.be.server.domain.order;
 import kr.hhplus.be.server.domain.order.dto.CreateOrderCommand;
 import kr.hhplus.be.server.domain.order.model.Order;
 import kr.hhplus.be.server.domain.order.model.OrderItem;
+import kr.hhplus.be.server.global.exception.DomainException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,5 +38,14 @@ public class OrderService {
         orderItemRepository.saveAll(orderItems);
 
         return order;
+    }
+
+    public Order getOrder(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new DomainException(OrderErrorCode.ORDER_NOT_FOUND));
+    }
+
+    public Order save(Order order) {
+        return orderRepository.save(order);
     }
 }

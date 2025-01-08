@@ -12,4 +12,12 @@ public class PaymentService {
     public Payment createPayment(Long orderId, Long totalAmount) {
         return paymentRepository.save(new Payment(orderId, totalAmount));
     }
+
+    public Payment getPaymentByOrderIdWithLock(Long orderId) {
+        return paymentRepository.getPaymentByOrderIdWithLock(orderId);
+    }
+
+    public Payment save(Payment payment) {
+        return paymentRepository.save(payment);
+    }
 }

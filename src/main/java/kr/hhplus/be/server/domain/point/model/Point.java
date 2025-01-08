@@ -29,29 +29,36 @@ public class Point extends BaseEntity {
     @Transient
     private final long MAXIMUM_BALANCE = 10_000_000;
 
-    public void charge(long amount) {
-        assertMinimumChargeAmount(amount);
-        assertMaximumChargeAmount(amount);
+    public void charge(Long amount) {
+        validateMinimumChargeAmount(amount);
+        validateMaximumChargeAmount(amount);
         long pointAfterCharge = balance + amount;
-        assertBalanceLimit(pointAfterCharge);
+        validateBalanceLimit(pointAfterCharge);
         balance = pointAfterCharge;
     }
 
-    private void assertMinimumChargeAmount(long amount) {
+    private void validateMinimumChargeAmount(Long amount) {
         if (amount < MINIMUM_CHARGE_POINT) {
             throw new DomainException(PointErrorCode.POINT_CHARGE_BELOW_MINIMUM);
         }
     }
 
-    private void assertMaximumChargeAmount(long amount) {
+    private void validateMaximumChargeAmount(Long amount) {
         if (amount > MAXIMUM_CHARGE_POINT) {
             throw new DomainException(PointErrorCode.POINT_CHARGE_EXCEEDS_MAXIMUM);
         }
     }
 
-    private void assertBalanceLimit(long amount) {
+    private void validateBalanceLimit(Long amount) {
         if (amount > MAXIMUM_BALANCE) {
             throw new DomainException(PointErrorCode.POINT_BALANCE_EXCEEDS_LIMIT);
         }
+    }
+
+    public void use(Long amount) {
+        if (balance < amount) {
+            throw new DomainException(PointErrorCode.POINT_BALANCE_INSUFFICIENT);
+        }
+        balance -= amount;
     }
 }

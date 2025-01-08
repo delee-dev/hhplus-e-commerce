@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.api.payment.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.hhplus.be.server.application.payment.dto.PaymentCommand;
 
 import java.util.Optional;
 
@@ -13,4 +14,7 @@ public record PayToOrderRequest(
         @Schema(description = "적용할 쿠폰 ID", nullable = true, example = "1")
         Optional<Long> couponId
 ) {
+        public PaymentCommand toApp() {
+                return new PaymentCommand(userId, orderId, couponId);
+        }
 }

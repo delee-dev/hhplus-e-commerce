@@ -7,7 +7,7 @@ import kr.hhplus.be.server.global.model.BaseEntity;
 
 import java.time.LocalDate;
 
-@Entity
+//@Entity
 @Table(name = "sales_statistics")
 public class SalesStatistics extends BaseEntity {
     @Id

@@ -5,7 +5,7 @@ import kr.hhplus.be.server.domain.product.model.Category;
 import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.global.model.BaseEntity;
 
-@Entity
+//@Entity
 @Table(name = "best_sellers")
 public class BestSeller extends BaseEntity {
     @Id

@@ -1,7 +1,9 @@
 package kr.hhplus.be.server.fixture;
 
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
+import kr.hhplus.be.server.domain.coupon.model.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.model.DiscountType;
+import kr.hhplus.be.server.domain.coupon.model.IssuedCoupon;
 import kr.hhplus.be.server.domain.point.model.Point;
 import kr.hhplus.be.server.domain.product.model.Category;
 import kr.hhplus.be.server.domain.product.model.Product;
@@ -37,6 +39,8 @@ public class TestDataFactory {
     public static class CouponConstants {
         public static final long NON_EXISTENT_COUPON_ID = 999L;
         public static final long EXISTENT_COUPON_ID = 1L;
+        public static final long VALID_ORDER_AMOUNT = 150_000L;
+        public static final long BELOW_MIN_COUPON_AMOUNT = 1_500L;
     }
 
     public static User createUser() {
@@ -144,6 +148,56 @@ public class TestDataFactory {
                 .set(field("validFrom"), LocalDateTime.now().minusMonths(1))
                 .set(field("validUntil"), LocalDateTime.now().plusMonths(1))
                 .set(field("totalQuantity"), 0)
+                .create();
+    }
+
+    public static Coupon createExpiredCoupon() {
+        return Instancio.of(Coupon.class)
+                .set(field("id"), 3L)
+                .set(field("name"), "여름 시즌 할인")
+                .set(field("discountType"), DiscountType.PERCENTAGE)
+                .set(field("discountAmount"), 10L)
+                .set(field("minOrderAmount"), 100000L)
+                .set(field("maxDiscountAmount"), 20000L)
+                .set(field("validFrom"), LocalDateTime.now().minusMonths(2))
+                .set(field("validUntil"), LocalDateTime.now().minusMonths(1))
+                .set(field("totalQuantity"), 0)
+                .create();
+    }
+
+    public static IssuedCoupon createIssuedCoupon() {
+        Coupon coupon = createCoupon();
+
+        return Instancio.of(IssuedCoupon.class)
+                .set(field("id"), 1L)
+                .set(field("coupon"), coupon)
+                .set(field("userId"), 1L)
+                .set(field("status"), CouponStatus.AVAILABLE)
+                .set(field("used_at"), null)
+                .create();
+    }
+
+    public static IssuedCoupon createUsedIssuedCoupon() {
+        Coupon coupon = createCoupon();
+
+        return Instancio.of(IssuedCoupon.class)
+                .set(field("id"), 2L)
+                .set(field("coupon"), coupon)
+                .set(field("userId"), 2L)
+                .set(field("status"), CouponStatus.USED)
+                .set(field("used_at"), LocalDateTime.now().minusDays(3))
+                .create();
+    }
+
+    public static IssuedCoupon createExpiredIssuedCoupon() {
+        Coupon coupon = createExpiredCoupon();
+
+        return Instancio.of(IssuedCoupon.class)
+                .set(field("id"), 3L)
+                .set(field("coupon"), coupon)
+                .set(field("userId"), 3L)
+                .set(field("status"), CouponStatus.AVAILABLE)
+                .set(field("used_at"), null)
                 .create();
     }
 }

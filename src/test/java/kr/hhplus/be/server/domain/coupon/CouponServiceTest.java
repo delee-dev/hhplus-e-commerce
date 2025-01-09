@@ -2,6 +2,8 @@ package kr.hhplus.be.server.domain.coupon;
 
 import kr.hhplus.be.server.domain.coupon.dto.IssueCouponCommand;
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
+import kr.hhplus.be.server.domain.coupon.model.CouponStatus;
+import kr.hhplus.be.server.domain.coupon.model.IssuedCoupon;
 import kr.hhplus.be.server.global.exception.DomainException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,10 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static kr.hhplus.be.server.fixture.TestDataFactory.CouponConstants.EXISTENT_COUPON_ID;
+import static kr.hhplus.be.server.fixture.TestDataFactory.CouponConstants.*;
 import static kr.hhplus.be.server.fixture.TestDataFactory.UserConstants.EXISTENT_USER_ID;
-import static kr.hhplus.be.server.fixture.TestDataFactory.createCoupon;
-import static kr.hhplus.be.server.fixture.TestDataFactory.createStockDepletedCoupon;
+import static kr.hhplus.be.server.fixture.TestDataFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -126,6 +127,70 @@ public class CouponServiceTest {
                             issuedCoupon.getCoupon() == coupon
                             && issuedCoupon.getUserId() == userId
                     ));
+        }
+    }
+
+    @Nested
+    class UseCouponTest {
+        @Test
+        void 이미_사용한_쿠폰은_사용에_실패한다() {
+            // given
+            IssuedCoupon usedIssuedCoupon = createUsedIssuedCoupon();
+            long orderAmount = VALID_ORDER_AMOUNT;
+
+            when(issuedCouponRepository.findByCouponIdAndUserIdWithLock(usedIssuedCoupon.getCoupon().getId(), usedIssuedCoupon.getUserId()))
+                    .thenReturn(usedIssuedCoupon);
+
+            // when & then
+            assertThatThrownBy(() -> couponService.useWithLock(usedIssuedCoupon.getCoupon().getId(), usedIssuedCoupon.getUserId(), orderAmount))
+                    .isInstanceOf(DomainException.class)
+                    .hasMessage(CouponErrorCode.COUPON_ALREADY_USED.getMessage());
+        }
+
+        @Test
+        void 유효_기간을_벗어난_쿠폰은_사용에_실패한다() {
+            // given
+            IssuedCoupon expiredIssuedCoupon = createExpiredIssuedCoupon();
+            long orderAmount = VALID_ORDER_AMOUNT;
+
+            when(issuedCouponRepository.findByCouponIdAndUserIdWithLock(expiredIssuedCoupon.getCoupon().getId(), expiredIssuedCoupon.getUserId()))
+                    .thenReturn(expiredIssuedCoupon);
+
+            // when & then
+            assertThatThrownBy(() -> couponService.useWithLock(expiredIssuedCoupon.getCoupon().getId(), expiredIssuedCoupon.getUserId(), orderAmount))
+                    .isInstanceOf(DomainException.class)
+                    .hasMessage(CouponErrorCode.COUPON_INVALID.getMessage());
+        }
+
+        @Test
+        void 주문금액이_최소금액_미만이면_사용에_실패한다() {
+            // given
+            IssuedCoupon issuedCoupon = createIssuedCoupon();
+            long belowMinCouponAmount = BELOW_MIN_COUPON_AMOUNT;
+
+            when(issuedCouponRepository.findByCouponIdAndUserIdWithLock(issuedCoupon.getCoupon().getId(), issuedCoupon.getUserId()))
+                    .thenReturn(issuedCoupon);
+
+            // when & then
+            assertThatThrownBy(() -> couponService.useWithLock(issuedCoupon.getCoupon().getId(), issuedCoupon.getUserId(), belowMinCouponAmount))
+                    .isInstanceOf(DomainException.class)
+                    .hasMessage(CouponErrorCode.COUPON_NOT_APPLICABLE_TO_PAYMENT.getMessage());
+        }
+
+        @Test
+        void 쿠폰_사용에_성공하면_쿠폰의_상태가_변경된다() {
+            // given
+            IssuedCoupon issuedCoupon = createIssuedCoupon();
+            long orderAmount = VALID_ORDER_AMOUNT;
+
+            when(issuedCouponRepository.findByCouponIdAndUserIdWithLock(issuedCoupon.getCoupon().getId(), issuedCoupon.getUserId()))
+                    .thenReturn(issuedCoupon);
+
+            // when
+            couponService.useWithLock(issuedCoupon.getCoupon().getId(), issuedCoupon.getUserId(), orderAmount);
+
+            // then
+            assertThat(issuedCoupon.getStatus()).isEqualTo(CouponStatus.USED);
         }
     }
 }

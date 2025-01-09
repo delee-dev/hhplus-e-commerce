@@ -4,6 +4,7 @@ import kr.hhplus.be.server.domain.point.model.Point;
 import kr.hhplus.be.server.domain.product.model.Category;
 import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.domain.product.model.SaleStatus;
+import kr.hhplus.be.server.domain.product.model.Stock;
 import kr.hhplus.be.server.domain.user.model.User;
 import org.instancio.Instancio;
 
@@ -23,6 +24,11 @@ public class TestDataFactory {
         public static final long EXCEED_MAX_CHARGE_AMOUNT = 1_500_000;
         public static final long VALID_USE_AMOUNT = 10_000L;
         public static final long EXCEED_BALANCE_AMOUNT = 60_000L;
+    }
+
+    public static class StockConstants {
+        public static final int EXCEED_CURRENT_STOCK_QUANTITY = 11;
+        public static final int CURRENT_STOCK_QUANTITY = 5;
     }
 
     public static User createUser() {
@@ -66,7 +72,7 @@ public class TestDataFactory {
                 .create();
     }
 
-    public static List<Product> createProductList() {
+    public static List<Product> createProducts() {
         Category category = createCategory();
         return List.of(
                 Instancio.of(Product.class)
@@ -84,6 +90,23 @@ public class TestDataFactory {
                         .set(field("category"), category)
                         .set(field("price"), 200000L)
                         .set(field("status"), SaleStatus.ON_SALE)
+                        .create()
+        );
+    }
+
+    public static List<Stock> createStocks() {
+        List<Product> products = createProducts();
+
+        return List.of(
+                Instancio.of(Stock.class)
+                        .set(field("id"), 1L)
+                        .set(field("product"), products.get(0))
+                        .set(field("quantity"), 5)
+                        .create(),
+                Instancio.of(Stock.class)
+                        .set(field("id"), 2L)
+                        .set(field("product"), products.get(1))
+                        .set(field("quantity"), 5)
                         .create()
         );
     }

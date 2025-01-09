@@ -18,12 +18,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Sql("data.sql")
 public class ProductServiceIntegrationTest {
     @Autowired
     private ProductService productService;
 
     @Nested
+    @Sql("list_data.sql")
     @DisplayName("상품 리스트 조회")
     class GetProducts {
         @Test
@@ -80,6 +80,41 @@ public class ProductServiceIntegrationTest {
             List<ProductResult> content = result.getContent();
             assertThat(content)
                     .isSortedAccordingTo(Comparator.comparing(ProductResult::name));
+        }
+    }
+
+    @Nested
+    @Sql("best_data.sql")
+    @DisplayName("상위 판매 상품 리스트 조회")
+    class GetBestSellingProducts {
+        @Test
+        void 상위_판매_상품_리스트_조회() {
+            // given
+            long categoryId = 1;
+
+            // when
+            List<ProductResult> result = productService.getBestSellingProducts(categoryId);
+
+            // then
+            assertThat(result.get(0))
+                    .extracting("id", "name")
+                    .contains(1L, "무선이어폰");
+
+            assertThat(result.get(1))
+                    .extracting("id", "name")
+                    .contains(7L, "게이밍 마우스");
+
+            assertThat(result.get(2))
+                    .extracting("id", "name")
+                    .contains(5L, "스마트워치");
+
+            assertThat(result.get(3))
+                    .extracting("id", "name")
+                    .contains(2L, "태블릿PC");
+
+            assertThat(result.get(4))
+                    .extracting("id", "name")
+                    .contains(8L, "기계식 키보드");
         }
     }
 }

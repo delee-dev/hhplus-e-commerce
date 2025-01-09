@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.fixture;
 
+import kr.hhplus.be.server.domain.coupon.model.Coupon;
+import kr.hhplus.be.server.domain.coupon.model.DiscountType;
 import kr.hhplus.be.server.domain.point.model.Point;
 import kr.hhplus.be.server.domain.product.model.Category;
 import kr.hhplus.be.server.domain.product.model.Product;
@@ -8,27 +10,33 @@ import kr.hhplus.be.server.domain.product.model.Stock;
 import kr.hhplus.be.server.domain.user.model.User;
 import org.instancio.Instancio;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.instancio.Select.field;
 
 public class TestDataFactory {
     public static class UserConstants {
-        public static final long NON_EXISTENT_USER_ID = 999;
-        public static final long EXISTENT_USER_ID = 1;
+        public static final long NON_EXISTENT_USER_ID = 999L;
+        public static final long EXISTENT_USER_ID = 1L;
     }
 
     public static class PointConstants {
         public static final long VALID_CHARGE_AMOUNT = 10_000;
         public static final long BELOW_MIN_CHARGE_AMOUNT = 900;
         public static final long EXCEED_MAX_CHARGE_AMOUNT = 1_500_000;
-        public static final long VALID_USE_AMOUNT = 10_000L;
-        public static final long EXCEED_BALANCE_AMOUNT = 60_000L;
+        public static final long VALID_USE_AMOUNT = 10_000;
+        public static final long EXCEED_BALANCE_AMOUNT = 60_000;
     }
 
     public static class StockConstants {
         public static final int EXCEED_CURRENT_STOCK_QUANTITY = 11;
         public static final int CURRENT_STOCK_QUANTITY = 5;
+    }
+
+    public static class CouponConstants {
+        public static final long NON_EXISTENT_COUPON_ID = 999L;
+        public static final long EXISTENT_COUPON_ID = 1L;
     }
 
     public static User createUser() {
@@ -109,5 +117,33 @@ public class TestDataFactory {
                         .set(field("quantity"), 5)
                         .create()
         );
+    }
+
+    public static Coupon createCoupon() {
+        return Instancio.of(Coupon.class)
+                .set(field("id"), 1L)
+                .set(field("name"), "신규가입 할인")
+                .set(field("discountType"), DiscountType.FIXED_AMOUNT)
+                .set(field("discountAmount"), 10000L)
+                .set(field("minOrderAmount"), 50000L)
+                .set(field("maxDiscountAmount"), 10000L)
+                .set(field("validFrom"), LocalDateTime.now().minusMonths(1))
+                .set(field("validUntil"), LocalDateTime.now().plusMonths(1))
+                .set(field("totalQuantity"), 100)
+                .create();
+    }
+
+    public static Coupon createStockDepletedCoupon() {
+        return Instancio.of(Coupon.class)
+                .set(field("id"), 2L)
+                .set(field("name"), "겨울 시즌 할인")
+                .set(field("discountType"), DiscountType.PERCENTAGE)
+                .set(field("discountAmount"), 10L)
+                .set(field("minOrderAmount"), 100000L)
+                .set(field("maxDiscountAmount"), 20000L)
+                .set(field("validFrom"), LocalDateTime.now().minusMonths(1))
+                .set(field("validUntil"), LocalDateTime.now().plusMonths(1))
+                .set(field("totalQuantity"), 0)
+                .create();
     }
 }

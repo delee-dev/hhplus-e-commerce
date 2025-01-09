@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import kr.hhplus.be.server.api.point.dto.ChargePointRequest;
 import kr.hhplus.be.server.api.point.dto.ChargePointResponse;
 import kr.hhplus.be.server.api.point.dto.GetPointResponse;
@@ -39,7 +42,7 @@ public interface PointSwaggerApiSpec {
                             )))
     })
     @Parameter(name = "userId", description = "사용자 ID", example = "1")
-    ResponseEntity<GetPointResponse> getPoint(long userId);
+    ResponseEntity<GetPointResponse> getPoint(@NotNull @Positive long userId);
 
     @Operation(
             summary = "포인트 충전",
@@ -115,6 +118,7 @@ public interface PointSwaggerApiSpec {
                             )))
     })
     ResponseEntity<ChargePointResponse> charge(
+            @Valid
             @RequestBody(
                     description = "포인트 충전 요청",
                     required = true,

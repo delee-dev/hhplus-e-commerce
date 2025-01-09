@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.hhplus.be.server.api.order.dto.OrderRequest;
 import kr.hhplus.be.server.api.order.dto.OrderResponse;
 import kr.hhplus.be.server.global.exception.ErrorResponse;
@@ -37,6 +38,7 @@ public interface OrderSwaggerApiSpec {
                             )))
     })
     ResponseEntity<OrderResponse> order(
+            @Valid
             @RequestBody(
                     description = "주문 생성 요청",
                     required = true,

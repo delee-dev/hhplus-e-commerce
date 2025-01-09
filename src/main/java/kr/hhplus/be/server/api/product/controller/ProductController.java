@@ -4,7 +4,6 @@ import kr.hhplus.be.server.api.product.dto.ProductSummaryResponse;
 import kr.hhplus.be.server.domain.product.ProductService;
 import kr.hhplus.be.server.domain.product.dto.GetProductsQuery;
 import kr.hhplus.be.server.domain.product.dto.ProductResult;
-import kr.hhplus.be.server.domain.product.model.SaleStatus;
 import kr.hhplus.be.server.global.model.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

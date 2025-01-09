@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.hhplus.be.server.api.coupon.dto.IssueCouponRequest;
 import kr.hhplus.be.server.api.coupon.dto.IssueCouponResponse;
 import kr.hhplus.be.server.global.exception.ErrorResponse;
@@ -64,6 +65,7 @@ public interface CouponSwaggerApiSpec {
                             ))),
     })
     ResponseEntity<IssueCouponResponse> issue(
+            @Valid
             @RequestBody(
                     description = "쿠폰 발급 요청",
                     required = true,

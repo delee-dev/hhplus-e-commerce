@@ -8,6 +8,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import kr.hhplus.be.server.api.product.dto.ProductSummaryResponse;
 import kr.hhplus.be.server.global.model.PageResponse;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +61,12 @@ public interface ProductSwaggerApiSpec {
             @Parameter(name = "sort", required = false, description = "정렬 기준 컬럼"),
             @Parameter(name = "direction", required = false, description = "정렬 방향(오름차순, 내림차순)"),
     })
-    ResponseEntity<PageResponse<ProductSummaryResponse>> getProductsByCategory(long categoryId, int page, int size, String sort, String direction);
+    ResponseEntity<PageResponse<ProductSummaryResponse>> getProductsByCategory(
+            @NotNull @Positive long categoryId,
+            @NotNull @PositiveOrZero int page,
+            @NotNull @Min(1) int size,
+            String sort,
+            String direction);
 
     @Operation(
             summary = "상위 판매 상품(베스트 셀러) 조회",
@@ -94,5 +103,5 @@ public interface ProductSwaggerApiSpec {
                     )
             ))
     @Parameter(name = "categoryId", required = true, description = "카테고리 ID")
-    ResponseEntity<List<ProductSummaryResponse>> getBestSellersByCategory(long categoryId);
+    ResponseEntity<List<ProductSummaryResponse>> getBestSellersByCategory(@NotNull @Positive long categoryId);
 }

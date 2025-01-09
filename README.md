@@ -6,3 +6,6 @@
 - [API별 다이어그램](docs/2.%20다이어그램/README.md)
 - [ERD](docs/3.%20ERD)
 - [API 명세서](docs/4.%20API%20명세서)
+
+## Swagger
+https://app.swaggerhub.com/apis/DELEEDEV/e-commerce/1.0.0#/Product%20API/getProductsByCategory

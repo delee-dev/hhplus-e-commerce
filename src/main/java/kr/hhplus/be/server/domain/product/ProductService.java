@@ -16,6 +16,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+    private static final int BEST_SELLING_LIMIT = 5;
+    private static final int SALES_PERIOD_DAYS = 3;
+
     private final ProductRepository productRepository;
     private final StockRepository stockRepository;
 
@@ -37,5 +40,11 @@ public class ProductService {
                     stockRepository.save(stock);
                     return productRepository.save(product);
                 }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductResult> getBestSellingProducts(Long categoryId) {
+        List<Product> products = productRepository.findBestSellingProductsByCategory(categoryId, SALES_PERIOD_DAYS, BEST_SELLING_LIMIT);
+        return products.stream().map(ProductResult::fromEntity).toList();
     }
 }

@@ -38,8 +38,18 @@ dependencies {
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
-	// Others
+	// Swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
+
+	// QueryDSL
+	implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+	annotationProcessor("com.querydsl:querydsl-apt:5.0.0:jakarta")
+	annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+	annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+
+	// Lombok
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -49,12 +59,22 @@ dependencies {
 	testImplementation ("io.rest-assured:rest-assured")
 	testImplementation ("org.instancio:instancio-junit:5.2.1")
 	testImplementation ("org.instancio:instancio-core:5.2.1")
-
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-	// Lombok
-	compileOnly("org.projectlombok:lombok")
-	annotationProcessor("org.projectlombok:lombok")
+}
+
+val querydslDir = "${projectDir}/build/generated"
+
+sourceSets {
+	main {
+		java {
+			srcDirs("${projectDir}/src/main/java", querydslDir)
+		}
+	}
+}
+
+tasks.withType<JavaCompile> {
+	options.generatedSourceOutputDirectory = file(querydslDir)
 }
 
 tasks.withType<Test> {

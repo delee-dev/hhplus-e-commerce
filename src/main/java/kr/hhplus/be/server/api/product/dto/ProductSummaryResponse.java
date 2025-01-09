@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import kr.hhplus.be.server.domain.product.dto.ProductResult;
 import kr.hhplus.be.server.domain.product.model.SaleStatus;
 
+import java.util.List;
+
 @Schema(description = "상품 조회 응답 DTO")
 public record ProductSummaryResponse(
         @Schema(description = "상품 ID", example = "1")
@@ -28,5 +30,11 @@ public record ProductSummaryResponse(
                         domainDto.price(),
                         domainDto.status()
                 );
+        }
+
+        public static List<ProductSummaryResponse> fromDomains(List<ProductResult> domainDtos) {
+                return domainDtos.stream()
+                        .map(ProductSummaryResponse::fromDomain)
+                        .toList();
         }
 }

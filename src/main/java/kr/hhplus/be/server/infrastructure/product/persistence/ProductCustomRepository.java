@@ -10,10 +10,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
-public class ProductJpaCustomRepository implements ProductRepository {
+public class ProductCustomRepository implements ProductRepository {
     private final ProductJpaRepository productJpaRepository;
+    private final ProductQueryRepository productQueryRepository;
 
     @Override
     public PageResponse<Product> findProductsByCategoryIdAndStatusNot(long categoryId, SaleStatus status, int page, int size, String sortColumn, String sortDirection) {
@@ -29,5 +32,10 @@ public class ProductJpaCustomRepository implements ProductRepository {
     @Override
     public Product save(Product product) {
         return productJpaRepository.save(product);
+    }
+
+    @Override
+    public List<Product> findBestSellingProductsByCategory(long categoryId, int period, int limit) {
+        return productQueryRepository.findBestSellingProductsByCategory(categoryId, period, limit);
     }
 }

@@ -39,12 +39,7 @@ public class ProductController implements ProductSwaggerApiSpec {
     @Override
     @GetMapping("/best")
     public ResponseEntity<List<ProductSummaryResponse>> getBestSellersByCategory(@RequestParam long categoryId) {
-        return ResponseEntity.ok(List.of(
-                new ProductSummaryResponse(2L, "울트라 게이밍 마우스", "초고성능 게이밍 마우스", "PC주변기기", 89000L, SaleStatus.ON_SALE),
-                new ProductSummaryResponse(15L, "스피커", "사운드 빵빵한 스피커", "PC주변기기", 130000L, SaleStatus.TEMPORARILY_OUT),
-                new ProductSummaryResponse(8L, "무선 충전 마우스패드", "고급 가죽 재질", "PC주변기기", 59000L, SaleStatus.ON_SALE),
-                new ProductSummaryResponse(5L, "기계식 게이밍 키보드", "청축 스위치 적용", "PC주변기기", 129000L, SaleStatus.ON_SALE),
-                new ProductSummaryResponse(7L, "4K 웹캠", "선명한 화질의 웹캠", "PC주변기기", 89000L, SaleStatus.TEMPORARILY_OUT)
-        ));
+        List<ProductSummaryResponse> responses = ProductSummaryResponse.fromDomains(productService.getBestSellingProducts(categoryId));
+        return ResponseEntity.ok(responses);
     }
 }

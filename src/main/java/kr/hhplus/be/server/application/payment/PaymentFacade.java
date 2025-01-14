@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.application.payment;
 
 import jakarta.transaction.Transactional;
+import kr.hhplus.be.server.application.dataplatform.DataPlatformPort;
 import kr.hhplus.be.server.application.payment.dto.PaymentCommand;
 import kr.hhplus.be.server.application.payment.dto.PaymentResult;
-import kr.hhplus.be.server.application.dataplatform.DataPlatformPort;
 import kr.hhplus.be.server.domain.coupon.CouponService;
 import kr.hhplus.be.server.domain.coupon.dto.UseCouponResult;
 import kr.hhplus.be.server.domain.order.OrderService;
@@ -27,7 +27,7 @@ public class PaymentFacade {
     public PaymentResult pay(PaymentCommand command) {
         // 결제 유효성 검사
         Payment payment = paymentService.getPaymentByOrderIdWithLock(command.orderId());
-        payment.validatePaymentEligibility();
+        payment.validatePaymentStatus();
 
         // 쿠폰 적용
         command.couponId().ifPresent(couponId -> {
@@ -39,18 +39,13 @@ public class PaymentFacade {
         pointService.useWithLock(command.userId(), payment.getFinalAmount());
 
         // 결제 상태 변경
-        payment.completePayment();
-        paymentService.save(payment);
+        payment.complete();
 
         // 주문 상태 변경
-        Order order = orderService.getOrder(payment.getOrderId());
-        order.completePayment();
-        orderService.save(order);
+        Order order = orderService.completePayment(payment.getOrderId());
 
         PaymentResult result = PaymentResult.from(order, payment);
-
         dataPlatformPort.call(result);
-
         return result;
     }
 }

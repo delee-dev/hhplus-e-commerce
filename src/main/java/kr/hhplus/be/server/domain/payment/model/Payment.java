@@ -38,7 +38,7 @@ public class Payment extends BaseEntity {
         this.status = PaymentStatus.PENDING;
     }
 
-    public void validatePaymentEligibility() {
+    public void validatePaymentStatus() {
         if (status == PaymentStatus.COMPLETED) {
             throw new DomainException(PaymentErrorCode.PAYMENT_ALREADY_COMPLETED);
         } else if (status == PaymentStatus.CANCELED) {
@@ -51,7 +51,7 @@ public class Payment extends BaseEntity {
         this.finalAmount = totalAmount - discountAmount;
     }
 
-    public void completePayment() {
+    public void complete() {
         this.status = PaymentStatus.COMPLETED;
     }
 }

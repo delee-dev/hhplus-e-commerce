@@ -16,8 +16,4 @@ public class PaymentService {
     public Payment getPaymentByOrderIdWithLock(Long orderId) {
         return paymentRepository.getPaymentByOrderIdWithLock(orderId);
     }
-
-    public Payment save(Payment payment) {
-        return paymentRepository.save(payment);
-    }
 }

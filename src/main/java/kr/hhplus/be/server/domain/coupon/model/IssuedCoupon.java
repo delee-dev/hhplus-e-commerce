@@ -42,13 +42,18 @@ public class IssuedCoupon extends BaseEntity {
         this.status = CouponStatus.AVAILABLE;
     }
 
-    public void validateApplicable(Long orderAmount) {
-        validateNotUsedCoupon();
-        coupon.validateCouponPeriod();
-        coupon.validateCouponAvailability(orderAmount);
+    public void use(Long orderAmount) {
+        validateUsage(orderAmount);
+        status = CouponStatus.USED;
+        used_at = LocalDateTime.now();
+    }
+
+    private void validateUsage(Long orderAmount) {
+        validateNotUsed();
+        coupon.validateUsage(orderAmount);
     }
     
-    private void validateNotUsedCoupon() {
+    private void validateNotUsed() {
         if (status == CouponStatus.USED) {
             throw new DomainException(CouponErrorCode.COUPON_ALREADY_USED);
         }
@@ -56,10 +61,5 @@ public class IssuedCoupon extends BaseEntity {
 
     public Long calculateDiscountAmount(Long orderAmount) {
         return coupon.calculateDiscountAmount(orderAmount);
-    }
-
-    public void useCoupon() {
-        status = CouponStatus.USED;
-        used_at = LocalDateTime.now();
     }
 }

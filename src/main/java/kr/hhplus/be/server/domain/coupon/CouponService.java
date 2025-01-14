@@ -18,26 +18,21 @@ public class CouponService {
 
     public UseCouponResult useWithLock(Long couponId, Long userId, Long orderAmount) {
         IssuedCoupon coupon = issuedCouponRepository.findByCouponIdAndUserIdWithLock(couponId, userId);
-        coupon.validateApplicable(orderAmount);
-        coupon.useCoupon();
-        issuedCouponRepository.save(coupon);
-        return new UseCouponResult(coupon.calculateDiscountAmount(orderAmount));
+        coupon.use(orderAmount);
+        Long discountAmount = coupon.calculateDiscountAmount(orderAmount);
+        return new UseCouponResult(discountAmount);
     }
 
     @Transactional
     public IssueCouponResult issueWithLock(IssueCouponCommand command) {
         Coupon coupon = couponRepository.findByIdWithLock(command.couponId())
                 .orElseThrow(() -> new DomainException(CouponErrorCode.COUPON_NOT_FOUND));
-        coupon.validateRemainingQuantity();
 
         if (issuedCouponRepository.existsByCouponIdAndUserId(command.couponId(), command.userId())) {
             throw new DomainException(CouponErrorCode.COUPON_ALREADY_ISSUED);
         }
 
-        coupon.decreaseQuantity();
-        IssuedCoupon issuedCoupon = new IssuedCoupon(coupon, command.userId());
-
-        couponRepository.save(coupon);
+        IssuedCoupon issuedCoupon = coupon.issue(command.userId());
         issuedCouponRepository.save(issuedCoupon);
 
         return IssueCouponResult.from(issuedCoupon);

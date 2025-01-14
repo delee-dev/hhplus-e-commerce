@@ -35,27 +35,38 @@ public class Coupon extends BaseEntity {
     @Column(nullable = false)
     private int totalQuantity;
 
-    public void validateCouponPeriod() {
+    public IssuedCoupon issue(Long userId) {
+        validateRemainingQuantity();
+        decreaseQuantity();
+        return new IssuedCoupon(this, userId);
+    }
+
+    private void validateRemainingQuantity() {
+        if (totalQuantity <= 0) {
+            throw new DomainException(CouponErrorCode.COUPON_STOCK_DEPLETED);
+        }
+    }
+
+    private void decreaseQuantity() {
+        totalQuantity --;
+    }
+
+    public void validateUsage(Long orderAmount) {
+        validatePeriod();
+        validateMinimumOrderAmount(orderAmount);
+    }
+
+    private void validatePeriod() {
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(validFrom) || now.isAfter(validUntil)) {
             throw new DomainException(CouponErrorCode.COUPON_INVALID);
         }
     }
 
-    public void validateCouponAvailability(Long actualOrderAmount) {
-        if (minOrderAmount != null && actualOrderAmount < minOrderAmount) {
+    private void validateMinimumOrderAmount(Long orderAmount) {
+        if (minOrderAmount != null && orderAmount < minOrderAmount) {
             throw new DomainException(CouponErrorCode.COUPON_NOT_APPLICABLE_TO_PAYMENT);
         }
-    }
-
-    public void validateRemainingQuantity() {
-        if (totalQuantity <= 0) {
-            throw new DomainException(CouponErrorCode.COUPON_STOCK_DEPLETED);
-        }
-    }
-
-    public void decreaseQuantity() {
-        totalQuantity --;
     }
 
     public Long calculateDiscountAmount(Long actualOrderAmount) {

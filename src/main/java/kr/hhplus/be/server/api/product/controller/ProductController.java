@@ -15,13 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/product")
 @RequiredArgsConstructor
 public class ProductController implements ProductSwaggerApiSpec {
     private final ProductService productService;
 
     @Override
-    @GetMapping(value = "/list")
+    @GetMapping(value = "/products")
     public ResponseEntity<PageResponse<ProductSummaryResponse>> getProductsByCategory(
             @RequestParam long categoryId,
             @RequestParam int page,
@@ -36,7 +35,7 @@ public class ProductController implements ProductSwaggerApiSpec {
     }
 
     @Override
-    @GetMapping("/best")
+    @GetMapping("/products/best")
     public ResponseEntity<List<ProductSummaryResponse>> getBestSellersByCategory(@RequestParam long categoryId) {
         List<ProductSummaryResponse> responses = ProductSummaryResponse.fromDomains(productService.getBestSellingProducts(categoryId));
         return ResponseEntity.ok(responses);

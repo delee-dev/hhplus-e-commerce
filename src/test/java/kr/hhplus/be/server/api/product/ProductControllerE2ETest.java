@@ -24,7 +24,7 @@ public class ProductControllerE2ETest extends BaseE2ETest {
                 .queryParam("page", page)
                 .queryParam("size", size)
             .when()
-                .get("/product/list")
+                .get("/products")
             .then()
                 .statusCode(200)
                 .body("content", hasSize(size));
@@ -40,7 +40,7 @@ public class ProductControllerE2ETest extends BaseE2ETest {
                 .given()
                 .queryParam("categoryId", categoryId)
                 .when()
-                .get("/product/best")
+                .get("/products/best")
                 .then()
                 .statusCode(200)
                 .body("size()", equalTo(3)); // 3일간 3개 상품만 거래 발생

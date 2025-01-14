@@ -11,7 +11,7 @@ public record ProductResult(
         long price,
         SaleStatus status
 ) {
-    public static ProductResult fromEntity(Product product) {
+    public static ProductResult from(Product product) {
         return new ProductResult(
                 product.getId(),
                 product.getName(),

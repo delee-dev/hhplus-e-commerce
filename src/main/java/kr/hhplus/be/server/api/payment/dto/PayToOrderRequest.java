@@ -22,7 +22,7 @@ public record PayToOrderRequest(
         @Schema(description = "적용할 쿠폰 ID", nullable = true, example = "1")
         Optional<Long> couponId
 ) {
-        public PaymentCommand toApp() {
+        public PaymentCommand to() {
                 return new PaymentCommand(userId, orderId, couponId);
         }
 }

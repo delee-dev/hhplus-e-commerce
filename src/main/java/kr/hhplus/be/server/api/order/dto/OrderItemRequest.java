@@ -18,7 +18,7 @@ public record OrderItemRequest(
         @Schema(description = "주문 수량", example = "3")
         int quantity
 ) {
-        public OrderItemCommand toApp() {
+        public OrderItemCommand to() {
                 return new OrderItemCommand(productId, quantity);
         }
 }

@@ -22,7 +22,7 @@ public record PayToOrderResponse(
         @Schema(description = "결제 시간", example = "2025-01-01T12:00:00")
         LocalDateTime paymentTime
 ) {
-        public static PayToOrderResponse fromApp(PaymentResult paymentResult) {
+        public static PayToOrderResponse from(PaymentResult paymentResult) {
                 return new PayToOrderResponse(
                         paymentResult.orderId(),
                         paymentResult.paymentId(),

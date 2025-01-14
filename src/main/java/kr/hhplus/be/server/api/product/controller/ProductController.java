@@ -8,7 +8,6 @@ import kr.hhplus.be.server.global.model.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,14 +29,14 @@ public class ProductController implements ProductSwaggerApiSpec {
     ) {
         GetProductsQuery query = new GetProductsQuery(categoryId, page, size, sort, direction);
         PageResponse<ProductResult> productPage = productService.getProductsByCategory(query);
-        PageResponse<ProductSummaryResponse> response = productPage.map(ProductSummaryResponse::fromDomain);
+        PageResponse<ProductSummaryResponse> response = productPage.map(ProductSummaryResponse::from);
         return ResponseEntity.ok(response);
     }
 
     @Override
     @GetMapping("/products/best")
     public ResponseEntity<List<ProductSummaryResponse>> getBestSellersByCategory(@RequestParam long categoryId) {
-        List<ProductSummaryResponse> responses = ProductSummaryResponse.fromDomains(productService.getBestSellingProducts(categoryId));
+        List<ProductSummaryResponse> responses = ProductSummaryResponse.from(productService.getBestSellingProducts(categoryId));
         return ResponseEntity.ok(responses);
     }
 }

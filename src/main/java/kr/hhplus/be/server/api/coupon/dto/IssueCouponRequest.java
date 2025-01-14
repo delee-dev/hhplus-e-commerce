@@ -17,7 +17,7 @@ public record IssueCouponRequest(
         @Schema(description = "사용자 ID", example = "1")
         Long userId
 ) {
-        public IssueCouponCommand toApp() {
+        public IssueCouponCommand to() {
                 return new IssueCouponCommand(couponId, userId);
         }
 }

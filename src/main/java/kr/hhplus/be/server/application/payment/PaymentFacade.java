@@ -47,7 +47,7 @@ public class PaymentFacade {
         order.completePayment();
         orderService.save(order);
 
-        PaymentResult result = PaymentResult.fromEntity(order, payment);
+        PaymentResult result = PaymentResult.from(order, payment);
 
         dataPlatformPort.call(result);
 

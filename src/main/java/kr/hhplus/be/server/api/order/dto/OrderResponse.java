@@ -17,7 +17,7 @@ public record OrderResponse(
         @Schema(description = "주문 시간", example = "2025-01-01T12:00:00")
         LocalDateTime orderTime
 ) {
-        public static OrderResponse fromApp(OrderResult orderResult) {
+        public static OrderResponse from(OrderResult orderResult) {
                 return new OrderResponse(
                         orderResult.orderId(),
                         orderResult.paymentId(),

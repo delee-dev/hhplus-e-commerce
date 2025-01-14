@@ -10,7 +10,7 @@ public record IssueCouponResponse(
         @Schema(description = "발급된 쿠폰 ID", example = "1")
         Long issuedCouponId
 ) {
-        public static IssueCouponResponse fromApp(IssueCouponResult issueCouponResult) {
+        public static IssueCouponResponse from(IssueCouponResult issueCouponResult) {
                 return new IssueCouponResponse(issueCouponResult.success(), issueCouponResult.issuedCouponId());
         }
 }

@@ -19,7 +19,7 @@ public class PaymentController implements PaymentSwaggerApiSpec {
     @Override
     @PatchMapping("/order")
     public ResponseEntity<PayToOrderResponse> payToOrder(@RequestBody PayToOrderRequest request) {
-        PayToOrderResponse response = PayToOrderResponse.fromApp(paymentFacade.pay(request.toApp()));
+        PayToOrderResponse response = PayToOrderResponse.from(paymentFacade.pay(request.to()));
 
         return ResponseEntity.ok(response);
     }

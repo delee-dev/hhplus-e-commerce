@@ -15,7 +15,7 @@ public record PaymentResult(
         PaymentStatus paymentStatus,
         LocalDateTime paymentTime
 ) {
-    public static PaymentResult fromEntity(Order order, Payment payment) {
+    public static PaymentResult from(Order order, Payment payment) {
         return new PaymentResult(
                 order.getId(),
                 payment.getId(),

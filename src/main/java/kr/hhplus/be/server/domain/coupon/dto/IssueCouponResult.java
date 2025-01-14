@@ -6,7 +6,7 @@ public record IssueCouponResult(
         boolean success,
         Long issuedCouponId
 ) {
-    public static IssueCouponResult fromEntity(IssuedCoupon issuedCoupon) {
+    public static IssueCouponResult from(IssuedCoupon issuedCoupon) {
         return new IssueCouponResult(true, issuedCoupon.getId());
     }
 }

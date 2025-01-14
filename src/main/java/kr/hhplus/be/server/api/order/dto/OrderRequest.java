@@ -38,9 +38,9 @@ public record OrderRequest(
         @Schema(description = "배송지 주소", example = "서울특별시 강남구 강남대로 123")
         String shippingAddress
 ) {
-        public OrderCommand toApp() {
+        public OrderCommand to() {
                 List<OrderItemCommand> orderItemCommands = orderItems.stream()
-                        .map(OrderItemRequest::toApp).toList();
+                        .map(OrderItemRequest::to).toList();
                 return new OrderCommand(userId, orderItemCommands, receiverName, receiverPhone, shippingAddress);
         }
 }

@@ -17,14 +17,14 @@ public class PointController implements PointSwaggerApiSpec {
     @Override
     @GetMapping
     public ResponseEntity<GetPointResponse> getPoint(@RequestParam long userId) {
-        GetPointResponse response = GetPointResponse.fromApp(pointFacade.getPoint(userId));
+        GetPointResponse response = GetPointResponse.from(pointFacade.getPoint(userId));
         return ResponseEntity.ok(response);
     }
 
     @Override
     @PatchMapping("/charge")
     public ResponseEntity<ChargePointResponse> charge(@RequestBody ChargePointRequest request) {
-        ChargePointResponse response = ChargePointResponse.fromApp(pointFacade.charge(request.userId(), request.amount()));
+        ChargePointResponse response = ChargePointResponse.from(pointFacade.charge(request.userId(), request.amount()));
         return ResponseEntity.ok(response);
     }
 }

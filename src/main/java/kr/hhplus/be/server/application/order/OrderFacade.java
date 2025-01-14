@@ -65,6 +65,6 @@ public class OrderFacade {
         // 결제 생성
         Payment payment = paymentService.createPayment(order.getId(), order.getTotalAmount());
 
-        return OrderResult.fromEntity(order, payment);
+        return OrderResult.from(order, payment);
     }
 }

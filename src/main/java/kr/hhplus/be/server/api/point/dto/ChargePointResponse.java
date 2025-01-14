@@ -12,7 +12,7 @@ public record ChargePointResponse(
         @Schema(description = "충전 후 잔액", example = "15000")
         long balance
 ) {
-        public static ChargePointResponse fromApp(PointResult domainDto) {
+        public static ChargePointResponse from(PointResult domainDto) {
                 return new ChargePointResponse(domainDto.userId(), domainDto.userName(), domainDto.balance());
         }
 }

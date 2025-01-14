@@ -19,7 +19,7 @@ public class CouponController implements CouponSwaggerApiSpec {
     @Override
     @PostMapping("/issue")
     public ResponseEntity<IssueCouponResponse> issue(@RequestBody IssueCouponRequest request) {
-        IssueCouponResponse response = IssueCouponResponse.fromApp(couponService.issueWithLock(request.toApp()));
+        IssueCouponResponse response = IssueCouponResponse.from(couponService.issueWithLock(request.to()));
 
         return ResponseEntity
                 .status(201)

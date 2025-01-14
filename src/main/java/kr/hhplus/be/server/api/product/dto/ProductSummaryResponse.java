@@ -21,7 +21,7 @@ public record ProductSummaryResponse(
         @Schema(description = "상품 판매 상태", example = "ON_SALE")
         SaleStatus status
 ) {
-        public static ProductSummaryResponse fromDomain(ProductResult domainDto) {
+        public static ProductSummaryResponse from(ProductResult domainDto) {
                 return new ProductSummaryResponse(
                         domainDto.id(),
                         domainDto.name(),
@@ -32,9 +32,9 @@ public record ProductSummaryResponse(
                 );
         }
 
-        public static List<ProductSummaryResponse> fromDomains(List<ProductResult> domainDtos) {
+        public static List<ProductSummaryResponse> from(List<ProductResult> domainDtos) {
                 return domainDtos.stream()
-                        .map(ProductSummaryResponse::fromDomain)
+                        .map(ProductSummaryResponse::from)
                         .toList();
         }
 }

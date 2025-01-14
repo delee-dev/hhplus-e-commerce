@@ -40,6 +40,6 @@ public class CouponService {
         couponRepository.save(coupon);
         issuedCouponRepository.save(issuedCoupon);
 
-        return IssueCouponResult.fromEntity(issuedCoupon);
+        return IssueCouponResult.from(issuedCoupon);
     }
 }

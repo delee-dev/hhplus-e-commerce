@@ -19,7 +19,7 @@ public class OrderController implements OrderSwaggerApiSpec {
     @Override
     @PostMapping
     public ResponseEntity<OrderResponse> order(@RequestBody OrderRequest request) {
-        OrderResponse response = OrderResponse.fromApp(orderFacade.order(request.toApp()));
+        OrderResponse response = OrderResponse.from(orderFacade.order(request.to()));
 
         return ResponseEntity
                 .status(201)

@@ -12,7 +12,7 @@ public record OrderResult(
         OrderStatus orderStatus,
         LocalDateTime orderTime
 ) {
-    public static OrderResult fromEntity(Order order, Payment payment) {
+    public static OrderResult from(Order order, Payment payment) {
         return new OrderResult(
                 order.getId(),
                 payment.getId(),

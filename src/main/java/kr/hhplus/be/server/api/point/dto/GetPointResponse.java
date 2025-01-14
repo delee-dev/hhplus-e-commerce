@@ -12,7 +12,7 @@ public record GetPointResponse(
         @Schema(description = "포인트 잔액", example = "10000")
         long balance
 ) {
-        public static GetPointResponse fromApp(PointResult domainDto) {
+        public static GetPointResponse from(PointResult domainDto) {
                 return new GetPointResponse(domainDto.userId(), domainDto.userName(), domainDto.balance());
         }
 }

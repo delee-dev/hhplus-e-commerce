@@ -25,7 +25,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public PageResponse<ProductResult> getProductsByCategory(GetProductsQuery query) {
         PageResponse<Product> productPage = productRepository.findProductsByCategoryIdAndStatusNot(query.categoryId(), SaleStatus.SUSPENDED, query.page(), query.size(), query.sortColumn(), query.sortDirection());
-        return productPage.map(ProductResult::fromEntity);
+        return productPage.map(ProductResult::from);
     }
 
     public List<Product> deductStocksWithLock(List<DeductStockCommand> commands) {
@@ -45,6 +45,6 @@ public class ProductService {
     @Transactional(readOnly = true)
     public List<ProductResult> getBestSellingProducts(Long categoryId) {
         List<Product> products = productRepository.findBestSellingProductsByCategory(categoryId, SALES_PERIOD_DAYS, BEST_SELLING_LIMIT);
-        return products.stream().map(ProductResult::fromEntity).toList();
+        return products.stream().map(ProductResult::from).toList();
     }
 }

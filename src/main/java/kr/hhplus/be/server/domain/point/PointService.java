@@ -19,11 +19,9 @@ public class PointService {
     }
 
     public Point chargeWithLock(Long userId, Long amount) {
-        // TODO: 재시도 로직 추가
         Point point = pointRepository.findByUserIdWithLock(userId)
                 .orElseThrow(() -> new DomainException(PointErrorCode.POINT_BALANCE_NOT_FOUND));
         point.charge(amount);
-        pointRepository.save(point);
 
         PointHistory pointHistory = new PointHistory(point, amount, TransactionType.CHARGE);
         pointHistoryRepository.save(pointHistory);
@@ -35,7 +33,6 @@ public class PointService {
         Point point = pointRepository.findByUserIdWithLock(userId)
                 .orElseThrow(() -> new DomainException(PointErrorCode.POINT_BALANCE_NOT_FOUND));
         point.use(amount);
-        pointRepository.save(point);
 
         PointHistory pointHistory = new PointHistory(point, amount, TransactionType.USE);
         pointHistoryRepository.save(pointHistory);

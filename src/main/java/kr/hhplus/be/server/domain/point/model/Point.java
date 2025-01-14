@@ -15,7 +15,7 @@ public class Point extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ColumnDefault("0")
-    private long balance;
+    private Long balance;
     @Column(nullable = false)
     private Long userId;
     @Version
@@ -30,11 +30,14 @@ public class Point extends BaseEntity {
     private final long MAXIMUM_BALANCE = 10_000_000;
 
     public void charge(Long amount) {
+        validateCharging(amount);
+        balance += amount;
+    }
+
+    private void validateCharging(Long amount) {
         validateMinimumChargeAmount(amount);
         validateMaximumChargeAmount(amount);
-        long pointAfterCharge = balance + amount;
-        validateBalanceLimit(pointAfterCharge);
-        balance = pointAfterCharge;
+        validateBalanceAfterCharge(amount);
     }
 
     private void validateMinimumChargeAmount(Long amount) {
@@ -49,16 +52,22 @@ public class Point extends BaseEntity {
         }
     }
 
-    private void validateBalanceLimit(Long amount) {
-        if (amount > MAXIMUM_BALANCE) {
+    private void validateBalanceAfterCharge(Long amount) {
+        long amountAfterCharge = balance + amount;
+
+        if (amountAfterCharge > MAXIMUM_BALANCE) {
             throw new DomainException(PointErrorCode.POINT_BALANCE_EXCEEDS_LIMIT);
         }
     }
 
     public void use(Long amount) {
+       validateSufficiency(amount);
+        balance -= amount;
+    }
+
+    private void validateSufficiency(Long amount) {
         if (balance < amount) {
             throw new DomainException(PointErrorCode.POINT_BALANCE_INSUFFICIENT);
         }
-        balance -= amount;
     }
 }

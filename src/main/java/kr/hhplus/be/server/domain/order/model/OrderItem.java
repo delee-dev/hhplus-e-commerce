@@ -26,12 +26,15 @@ public class OrderItem extends BaseEntity {
     @Column(nullable = false)
     private int quantity;
 
-    public OrderItem(Order order, Long productId, String productName, Long price, int quantity) {
-        this.order = order;
+    public OrderItem(Long productId, String productName, Long price, int quantity) {
         this.productId = productId;
         this.productName = productName;
         this.price = price;
         this.quantity = quantity;
+    }
+
+    protected void assignOrder(Order order) {
+        this.order = order;
     }
 
     protected long calculateTotalAmount() {

@@ -13,39 +13,31 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
 
     public Order createOrder(CreateOrderCommand command) {
-        Order order = new Order(
-                command.userId(),
-                command.receiverName(),
-                command.receiverPhone(),
-                command.shippingAddress()
-        );
         List<OrderItem> orderItems = command.orderItems().stream().map(itemCommand -> {
             return new OrderItem(
-                    order,
                     itemCommand.productId(),
                     itemCommand.productName(),
                     itemCommand.price(),
                     itemCommand.quantity()
             );
         }).toList();
+        Order order = new Order(
+                command.userId(),
+                orderItems,
+                command.receiverName(),
+                command.receiverPhone(),
+                command.shippingAddress()
+        );
 
-        order.changeOrderItems(orderItems);
-
-        orderRepository.save(order);
-        orderItemRepository.saveAll(orderItems);
-
-        return order;
-    }
-
-    public Order getOrder(Long orderId) {
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new DomainException(OrderErrorCode.ORDER_NOT_FOUND));
-    }
-
-    public Order save(Order order) {
         return orderRepository.save(order);
+    }
+
+    public Order completePayment(Long orderId) {
+        Order order =  orderRepository.findById(orderId)
+                .orElseThrow(() -> new DomainException(OrderErrorCode.ORDER_NOT_FOUND));
+        order.completePay();
+        return order;
     }
 }

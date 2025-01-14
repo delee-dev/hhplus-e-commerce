@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,8 +19,8 @@ public class Order extends BaseEntity {
     private Long id;
     @Column(nullable = false)
     private Long userId;
-    @OneToMany(mappedBy = "order")
-    private List<OrderItem> orderItems;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
+    private List<OrderItem> orderItems = new ArrayList<>();
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status;
@@ -32,20 +33,23 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     private String shippingAddress;
 
-    public Order(Long userId, String receiverName, String receiverPhone, String shippingAddress) {
+    public Order(Long userId, List<OrderItem> orderItems, String receiverName, String receiverPhone, String shippingAddress) {
         this.userId = userId;
+        this.totalAmount = 0L;
+        orderItems.forEach(this::addOrderItem);
         this.receiverName = receiverName;
         this.receiverPhone = receiverPhone;
         this.shippingAddress = shippingAddress;
         this.status = OrderStatus.PAYMENT_PENDING;
     }
 
-    public void changeOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-        this.totalAmount = orderItems.stream().mapToLong(OrderItem::calculateTotalAmount).sum();
+    private void addOrderItem(OrderItem orderItem) {
+        this.orderItems.add(orderItem);
+        this.totalAmount += orderItem.calculateTotalAmount();
+        orderItem.assignOrder(this);
     }
 
-    public void completePayment() {
+    public void completePay() {
         this.status = OrderStatus.PAYMENT_COMPLETED;
     }
 }

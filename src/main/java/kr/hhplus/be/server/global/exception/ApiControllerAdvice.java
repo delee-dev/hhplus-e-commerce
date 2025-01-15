@@ -20,13 +20,13 @@ class ApiControllerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(500).body(new ErrorResponse(500, e.getMessage()));
     }
 
-    @ExceptionHandler(value = DomainException.class)
-    public ResponseEntity<ErrorResponse> handleException(DomainException e) {
-        return ResponseEntity.status(e.getErrorCode().getStatus()).body(new ErrorResponse(e.getStatus(), e.getMessage()));
+    @ExceptionHandler(value = BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
+        return ResponseEntity.status(e.getErrorCode().getStatus()).body(new ErrorResponse(e.getCode(), e.getStatus(), e.getMessage()));
     }
 
     @ExceptionHandler(value = OptimisticLockingFailureException.class)
-    public ResponseEntity<ErrorResponse> handleException(OptimisticLockingFailureException e) {
+    public ResponseEntity<ErrorResponse> handleOptimisticLockException(OptimisticLockingFailureException e) {
         return ResponseEntity.status(409).body(new ErrorResponse(409, "데이터가 이미 변경되었습니다. 최신 데이터를 확인해주세요."));
     }
 

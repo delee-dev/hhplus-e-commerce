@@ -4,7 +4,7 @@ import kr.hhplus.be.server.application.order.dto.OrderCommand;
 import kr.hhplus.be.server.application.order.dto.OrderItemCommand;
 import kr.hhplus.be.server.domain.product.ProductErrorCode;
 import kr.hhplus.be.server.domain.product.StockRepository;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,9 +55,9 @@ public class OrderFacadeIntegrationTest {
                     );
                     orderFacade.order(command);
                     successCount.getAndIncrement();
-                } catch (DomainException e) {
+                } catch (BusinessException e) {
                     assertThat(e)
-                            .isInstanceOf(DomainException.class)
+                            .isInstanceOf(BusinessException.class)
                             .hasMessage(ProductErrorCode.PRODUCT_OUT_OF_STOCK.getMessage());
                     failureCount.getAndIncrement();
                 } finally {

@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.product.model;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.product.ProductErrorCode;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import kr.hhplus.be.server.global.model.BaseEntity;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
@@ -23,7 +23,7 @@ public class Stock extends BaseEntity {
 
     public int deduct(int amount) {
         if (quantity - amount < 0) {
-            throw new DomainException(ProductErrorCode.PRODUCT_OUT_OF_STOCK);
+            throw new BusinessException(ProductErrorCode.PRODUCT_OUT_OF_STOCK);
         }
         quantity -= amount;
         return quantity;

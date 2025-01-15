@@ -3,7 +3,7 @@ package kr.hhplus.be.server.domain.order;
 import kr.hhplus.be.server.domain.order.dto.CreateOrderCommand;
 import kr.hhplus.be.server.domain.order.model.Order;
 import kr.hhplus.be.server.domain.order.model.OrderItem;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +36,7 @@ public class OrderService {
 
     public Order completePayment(Long orderId) {
         Order order =  orderRepository.findById(orderId)
-                .orElseThrow(() -> new DomainException(OrderErrorCode.ORDER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(OrderErrorCode.ORDER_NOT_FOUND));
         order.completePay();
         return order;
     }

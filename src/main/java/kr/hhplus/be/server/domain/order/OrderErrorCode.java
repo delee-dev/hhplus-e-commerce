@@ -5,12 +5,14 @@ import lombok.Getter;
 
 @Getter
 public enum OrderErrorCode implements ErrorCode {
-    ORDER_NOT_FOUND(404, "존재하지 않는 주문입니다.");
+    ORDER_NOT_FOUND("ORDER_001", 404, "존재하지 않는 주문입니다.");
 
+    private String code;
     private int status;
     private String message;
 
-    OrderErrorCode(int status, String message) {
+    OrderErrorCode(String code, int status, String message) {
+        this.code = code;
         this.status = status;
         this.message = message;
     }

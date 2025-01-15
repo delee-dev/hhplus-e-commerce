@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.payment.model;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.payment.PaymentErrorCode;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import kr.hhplus.be.server.global.model.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -40,9 +40,9 @@ public class Payment extends BaseEntity {
 
     public void validatePaymentStatus() {
         if (status == PaymentStatus.COMPLETED) {
-            throw new DomainException(PaymentErrorCode.PAYMENT_ALREADY_COMPLETED);
+            throw new BusinessException(PaymentErrorCode.PAYMENT_ALREADY_COMPLETED);
         } else if (status == PaymentStatus.CANCELED) {
-            throw new DomainException(PaymentErrorCode.PAYMENT_ALREADY_CANCELLED);
+            throw new BusinessException(PaymentErrorCode.PAYMENT_ALREADY_CANCELLED);
         }
     }
 

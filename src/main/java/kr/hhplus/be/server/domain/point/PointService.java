@@ -3,7 +3,7 @@ package kr.hhplus.be.server.domain.point;
 import kr.hhplus.be.server.domain.point.model.Point;
 import kr.hhplus.be.server.domain.point.model.PointHistory;
 import kr.hhplus.be.server.domain.point.model.TransactionType;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +15,12 @@ public class PointService {
 
     public Point getPoint(Long userId) {
         return pointRepository.findByUserId(userId)
-                .orElseThrow(() -> new DomainException(PointErrorCode.POINT_BALANCE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(PointErrorCode.POINT_BALANCE_NOT_FOUND));
     }
 
     public Point chargeWithLock(Long userId, Long amount) {
         Point point = pointRepository.findByUserIdWithLock(userId)
-                .orElseThrow(() -> new DomainException(PointErrorCode.POINT_BALANCE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(PointErrorCode.POINT_BALANCE_NOT_FOUND));
         point.charge(amount);
 
         PointHistory pointHistory = new PointHistory(point, amount, TransactionType.CHARGE);
@@ -31,7 +31,7 @@ public class PointService {
 
     public Point useWithLock(Long userId, Long amount) {
         Point point = pointRepository.findByUserIdWithLock(userId)
-                .orElseThrow(() -> new DomainException(PointErrorCode.POINT_BALANCE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(PointErrorCode.POINT_BALANCE_NOT_FOUND));
         point.use(amount);
 
         PointHistory pointHistory = new PointHistory(point, amount, TransactionType.USE);

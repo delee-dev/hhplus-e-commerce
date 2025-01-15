@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.coupon;
 
 import kr.hhplus.be.server.domain.coupon.dto.IssueCouponCommand;
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +40,7 @@ public class CouponServiceTest {
 
             // when & then
             assertThatThrownBy(() -> couponService.issueWithLock(command))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(CouponErrorCode.COUPON_NOT_FOUND.getMessage());
         }
 
@@ -58,7 +58,7 @@ public class CouponServiceTest {
 
             // when & then
             assertThatThrownBy(() -> couponService.issueWithLock(command))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(CouponErrorCode.COUPON_ALREADY_ISSUED.getMessage());
         }
 

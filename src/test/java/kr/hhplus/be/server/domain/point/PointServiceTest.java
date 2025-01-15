@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.point;
 
 import kr.hhplus.be.server.domain.point.model.Point;
 import kr.hhplus.be.server.domain.point.model.TransactionType;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ public class PointServiceTest {
 
             // when & then
             assertThatThrownBy(() -> pointService.getPoint(nonExistentUserId))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(PointErrorCode.POINT_BALANCE_NOT_FOUND.getMessage());
         }
 
@@ -78,7 +78,7 @@ public class PointServiceTest {
 
             // when & then
             assertThatThrownBy(() -> pointService.chargeWithLock(nonExistentUserId, chargeAmount))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(PointErrorCode.POINT_BALANCE_NOT_FOUND.getMessage());
         }
 
@@ -119,7 +119,7 @@ public class PointServiceTest {
 
             // when & then
             assertThatThrownBy(() -> pointService.useWithLock(nonExistentUserId, useAmount))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(PointErrorCode.POINT_BALANCE_NOT_FOUND.getMessage());
         }
 

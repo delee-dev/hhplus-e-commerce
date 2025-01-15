@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.coupon.model;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.coupon.CouponErrorCode;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import kr.hhplus.be.server.global.model.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -55,7 +55,7 @@ public class IssuedCoupon extends BaseEntity {
     
     private void validateNotUsed() {
         if (status == CouponStatus.USED) {
-            throw new DomainException(CouponErrorCode.COUPON_ALREADY_USED);
+            throw new BusinessException(CouponErrorCode.COUPON_ALREADY_USED);
         }
     }
 

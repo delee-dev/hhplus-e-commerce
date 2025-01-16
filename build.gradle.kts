@@ -52,6 +52,9 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 
+	// Logging
+	implementation("org.slf4j:slf4j-api")
+
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
@@ -61,7 +64,6 @@ dependencies {
 	testImplementation ("org.instancio:instancio-junit:5.2.1")
 	testImplementation ("org.instancio:instancio-core:5.2.1")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
 }
 
 val querydslDir = "${projectDir}/build/generated"

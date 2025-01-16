@@ -16,7 +16,7 @@ public class PaymentJpaCustomRepository implements PaymentRepository {
     }
 
     @Override
-    public Payment getPaymentByOrderIdWithLock(Long orderId) {
+    public Payment findByOrderIdWithLock(Long orderId) {
         return paymentJpaRepository.findByOrderId(orderId);
     }
 }

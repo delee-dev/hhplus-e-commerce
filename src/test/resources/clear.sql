@@ -1,0 +1,11 @@
+TRUNCATE TABLE issued_coupons;
+TRUNCATE TABLE coupons;
+TRUNCATE TABLE payments;
+TRUNCATE TABLE order_items;
+TRUNCATE TABLE orders;
+TRUNCATE TABLE stocks;
+TRUNCATE TABLE products;
+TRUNCATE TABLE categories;
+TRUNCATE TABLE point_histories;
+TRUNCATE TABLE points;
+TRUNCATE TABLE users;

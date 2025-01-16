@@ -99,6 +99,7 @@ create table payments
     discount_amount bigint default 0                          not null,
     final_amount    bigint                                    not null,
     status          enum ('CANCELED', 'COMPLETED', 'PENDING') not null,
+    paid_at         datetime(6)                               ,
     created_at      datetime(6)                               ,
     updated_at      datetime(6)
 );

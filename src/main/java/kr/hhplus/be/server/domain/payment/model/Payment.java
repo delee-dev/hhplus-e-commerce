@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "payments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,6 +31,7 @@ public class Payment extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentStatus status;
+    private LocalDateTime paidAt;
 
     public Payment(Long orderId, Long totalAmount) {
         this.orderId = orderId;
@@ -53,5 +56,6 @@ public class Payment extends BaseEntity {
 
     public void complete() {
         this.status = PaymentStatus.COMPLETED;
+        this.paidAt = LocalDateTime.now();
     }
 }

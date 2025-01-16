@@ -2,17 +2,23 @@ package kr.hhplus.be.server.fixture.integration;
 
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
 import kr.hhplus.be.server.domain.coupon.model.DiscountType;
+import kr.hhplus.be.server.domain.order.model.Order;
+import kr.hhplus.be.server.domain.order.model.OrderItem;
+import kr.hhplus.be.server.domain.payment.model.Payment;
+import kr.hhplus.be.server.domain.payment.model.PaymentStatus;
 import kr.hhplus.be.server.domain.point.model.Point;
 import kr.hhplus.be.server.domain.product.model.Category;
 import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.domain.product.model.SaleStatus;
 import kr.hhplus.be.server.domain.product.model.Stock;
 import kr.hhplus.be.server.domain.user.model.User;
+import kr.hhplus.be.server.global.model.BaseEntity;
 import org.instancio.Instancio;
 import org.instancio.Model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.instancio.Select.field;
 
@@ -110,6 +116,48 @@ public class Fixture {
                 .set(field("product"), product)
                 .set(field("quantity"), quantity)
                 .create();
+    }
+
+    private static List<OrderItem> orderItems(List<Product> products) {
+        AtomicInteger quantity = new AtomicInteger(1);
+        return products.stream().map(product -> {
+            return Instancio.of(OrderItem.class)
+                    .set(field("id"), null)
+                    .set(field("order"), null)
+                    .set(field("productId"), product.getId())
+                    .set(field("productName"), product.getName())
+                    .set(field("price"), product.getPrice())
+                    .set(field("quantity"), quantity.getAndIncrement())
+                    .create();
+        }).toList();
+    }
+
+    public static List<Order> orders(User user, List<Product> products) {
+        List<OrderItem> orderItems = orderItems(products);
+        return orderItems.stream().map(orderItem -> {
+            return new Order(
+                    user.getId(),
+                    List.of(orderItem),
+                    "이다은",
+                    "010-1234-1234",
+                    "서울시 광진구 능동로"
+            );
+        }).toList();
+    }
+
+    public static List<Payment> payments(List<Order> orders) {
+        AtomicInteger day = new AtomicInteger(1);
+        return orders.stream().map(order -> {
+            return Instancio.of(Payment.class)
+                    .set(field("id"), null)
+                    .set(field("orderId"), order.getId())
+                    .set(field("totalAmount"), order.getTotalAmount())
+                    .set(field("discountAmount"), 0L)
+                    .set(field("finalAmount"), order.getTotalAmount())
+                    .set(field("status"), PaymentStatus.COMPLETED)
+                    .set(field(BaseEntity::getUpdatedAt), LocalDateTime.now().minusDays(day.getAndIncrement()))
+                    .create();
+        }).toList();
     }
 
     public static Coupon coupon(int quantity) {

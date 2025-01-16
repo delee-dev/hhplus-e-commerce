@@ -12,7 +12,6 @@ import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.domain.product.model.SaleStatus;
 import kr.hhplus.be.server.domain.product.model.Stock;
 import kr.hhplus.be.server.domain.user.model.User;
-import kr.hhplus.be.server.global.model.BaseEntity;
 import org.instancio.Instancio;
 import org.instancio.Model;
 
@@ -39,10 +38,30 @@ public class Fixture {
                 .create();
     }
 
+    public static Point point(User user, Long balance) {
+        return Instancio.of(Point.class)
+                .set(field("id"), null)
+                .set(field("balance"), balance)
+                .set(field("userId"), user.getId())
+                .set(field("version"), 0L)
+                .create();
+    }
+
     public static Category category() {
         return Instancio.of(Category.class)
                 .set(field("id"), null)
                 .set(field("name"), "전자기기")
+                .create();
+    }
+
+    public static Product product(Category category) {
+        return Instancio.of(Product.class)
+                .set(field("id"), null)
+                .set(field("name"), "무선이어폰")
+                .set(field("description"), "고음질 무선이어폰")
+                .set(field("category"), category)
+                .set(field("price"), 10_000L)
+                .set(field("status"), SaleStatus.ON_SALE)
                 .create();
     }
 
@@ -155,7 +174,7 @@ public class Fixture {
                     .set(field("discountAmount"), 0L)
                     .set(field("finalAmount"), order.getTotalAmount())
                     .set(field("status"), PaymentStatus.COMPLETED)
-                    .set(field(BaseEntity::getUpdatedAt), LocalDateTime.now().minusDays(day.getAndIncrement()))
+                    .set(field("paidAt"), LocalDateTime.now().minusDays(day.getAndIncrement()))
                     .create();
         }).toList();
     }

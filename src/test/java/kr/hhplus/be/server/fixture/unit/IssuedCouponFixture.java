@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.coupon.fixture;
+package kr.hhplus.be.server.fixture.unit;
 
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
 import kr.hhplus.be.server.domain.coupon.model.CouponStatus;

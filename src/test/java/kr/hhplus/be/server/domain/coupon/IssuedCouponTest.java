@@ -7,9 +7,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static kr.hhplus.be.server.domain.coupon.fixture.CouponFixture.VALID_ORDER_AMOUNT;
-import static kr.hhplus.be.server.domain.coupon.fixture.IssuedCouponFixture.issuedCoupon;
-import static kr.hhplus.be.server.domain.coupon.fixture.IssuedCouponFixture.usedCoupon;
+import static kr.hhplus.be.server.fixture.unit.CouponFixture.VALID_ORDER_AMOUNT;
+import static kr.hhplus.be.server.fixture.unit.IssuedCouponFixture.issuedCoupon;
+import static kr.hhplus.be.server.fixture.unit.IssuedCouponFixture.usedCoupon;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

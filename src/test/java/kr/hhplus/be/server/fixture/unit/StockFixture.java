@@ -1,11 +1,11 @@
-package kr.hhplus.be.server.domain.product.fixture;
+package kr.hhplus.be.server.fixture.unit;
 
 import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.domain.product.model.Stock;
 import org.instancio.Instancio;
 import org.instancio.InstancioApi;
 
-import static kr.hhplus.be.server.domain.product.fixture.ProductFixture.product;
+import static kr.hhplus.be.server.fixture.unit.ProductFixture.product;
 import static org.instancio.Select.field;
 
 public class StockFixture {

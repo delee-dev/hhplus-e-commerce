@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static kr.hhplus.be.server.domain.coupon.fixture.CouponFixture.coupon;
+import static kr.hhplus.be.server.fixture.unit.CouponFixture.coupon;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;

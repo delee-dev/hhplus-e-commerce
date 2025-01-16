@@ -4,7 +4,7 @@ import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.domain.product.model.SaleStatus;
 import org.junit.jupiter.api.Test;
 
-import static kr.hhplus.be.server.domain.product.fixture.ProductFixture.product;
+import static kr.hhplus.be.server.fixture.unit.ProductFixture.product;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProductTest {

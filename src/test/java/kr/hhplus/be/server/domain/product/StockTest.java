@@ -6,8 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static kr.hhplus.be.server.domain.product.fixture.StockFixture.VALID_DEDUCTION_AMOUNT;
-import static kr.hhplus.be.server.domain.product.fixture.StockFixture.stock;
+import static kr.hhplus.be.server.fixture.unit.StockFixture.VALID_DEDUCTION_AMOUNT;
+import static kr.hhplus.be.server.fixture.unit.StockFixture.stock;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

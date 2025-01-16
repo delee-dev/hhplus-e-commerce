@@ -1,9 +1,9 @@
-package kr.hhplus.be.server.domain.point.fixture;
+package kr.hhplus.be.server.fixture.unit;
 
 import kr.hhplus.be.server.domain.point.model.Point;
 import kr.hhplus.be.server.domain.user.model.User;
 import org.instancio.Instancio;
-import org.instancio.InstancioApi;
+import org.instancio.Model;
 
 import static org.instancio.Select.field;
 
@@ -20,22 +20,20 @@ public class PointFixture {
                 .create();
     }
 
-    private static InstancioApi<Point> basePoint() {
-        User user = user();
-        return Instancio.of(Point.class)
-                .set(field("id"), 1L)
-                .set(field("balance"), 50_000L)
-                .set(field("userId"), user.getId())
-                .set(field("version"), 1L);
-    }
+    private static final Model<Point> basePoint = Instancio.of(Point.class)
+            .set(field("id"), 1L)
+            .set(field("balance"), 50_000L)
+            .set(field("userId"), user().getId())
+            .set(field("version"), 1L)
+            .toModel();
 
     public static Point point() {
-        return basePoint()
+        return Instancio.of(basePoint)
                 .create();
     }
 
     public static Point pointNearLimit() {
-        return basePoint()
+        return Instancio.of(basePoint)
                 .set(field("balance"), 9_999_999L)
                 .create();
     }

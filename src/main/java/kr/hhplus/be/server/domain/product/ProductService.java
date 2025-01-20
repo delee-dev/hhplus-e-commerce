@@ -29,6 +29,7 @@ public class ProductService {
         return productPage.map(ProductResult::from);
     }
 
+    @Transactional
     public List<Product> deductStocksWithLock(List<DeductStockCommand> commands) {
         return commands.stream()
                 .sorted(Comparator.comparing(DeductStockCommand::productId))

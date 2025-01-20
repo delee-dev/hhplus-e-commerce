@@ -6,6 +6,7 @@ import kr.hhplus.be.server.domain.order.model.OrderItem;
 import kr.hhplus.be.server.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
 
+    @Transactional
     public Order createOrder(CreateOrderCommand command) {
         List<OrderItem> orderItems = command.orderItems().stream().map(itemCommand -> {
             return new OrderItem(
@@ -34,6 +36,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    @Transactional
     public Order completePayment(Long orderId) {
         Order order =  orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException(OrderErrorCode.ORDER_NOT_FOUND));

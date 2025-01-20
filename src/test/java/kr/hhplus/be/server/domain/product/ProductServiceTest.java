@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static kr.hhplus.be.server.domain.product.fixture.ProductFixture.*;
+import static kr.hhplus.be.server.fixture.unit.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 

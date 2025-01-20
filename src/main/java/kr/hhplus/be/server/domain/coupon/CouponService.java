@@ -16,6 +16,7 @@ public class CouponService {
     private final IssuedCouponRepository issuedCouponRepository;
     private final CouponRepository couponRepository;
 
+    @Transactional
     public UseCouponResult useWithLock(Long couponId, Long userId, Long orderAmount) {
         IssuedCoupon coupon = issuedCouponRepository.findByCouponIdAndUserIdWithLock(couponId, userId);
         coupon.use(orderAmount);

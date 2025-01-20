@@ -36,7 +36,7 @@ public class ProductQueryRepository {
                 .join(payment).on(orderItem.order.id.eq(payment.orderId))
                 .where(
                         category.id.eq(categoryId)
-                                .and(payment.updatedAt.between(
+                                .and(payment.paidAt.between(
                                         start,
                                         end
                                 ))

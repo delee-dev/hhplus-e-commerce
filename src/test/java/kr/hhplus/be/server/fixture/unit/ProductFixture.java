@@ -1,10 +1,10 @@
-package kr.hhplus.be.server.domain.product.fixture;
+package kr.hhplus.be.server.fixture.unit;
 
 import kr.hhplus.be.server.domain.product.model.Category;
 import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.domain.product.model.SaleStatus;
 import org.instancio.Instancio;
-import org.instancio.InstancioApi;
+import org.instancio.Model;
 
 import java.util.List;
 
@@ -25,20 +25,17 @@ public class ProductFixture {
                 .create();
     }
 
-    private static InstancioApi<Product> baseProduct() {
-        Category category = category();
-
-        return Instancio.of(Product.class)
-                .set(field("id"), 1L)
-                .set(field("name"), "무선이어폰")
-                .set(field("description"), "고음질 무선이어폰")
-                .set(field("category"), category)
-                .set(field("price"), 100000L)
-                .set(field("status"), SaleStatus.ON_SALE);
-    }
+    private static final Model<Product> baseProduct = Instancio.of(Product.class)
+            .set(field("id"), 1L)
+            .set(field("name"), "무선이어폰")
+            .set(field("description"), "고음질 무선이어폰")
+            .set(field("category"), category())
+            .set(field("price"), 100000L)
+            .set(field("status"), SaleStatus.ON_SALE)
+            .toModel();
 
     public static Product product() {
-        return baseProduct()
+        return Instancio.of(baseProduct)
                 .create();
     }
 

@@ -5,12 +5,14 @@ import lombok.Getter;
 
 @Getter
 public enum UserErrorCode implements ErrorCode {
-    USER_NOT_FOUND(404, "유저가 존재하지 않습니다.");
+    USER_NOT_FOUND("USER_001", 404, "유저가 존재하지 않습니다.");
 
+    private String code;
     private int status;
     private String message;
 
-    UserErrorCode(int status, String message) {
+    UserErrorCode(String code, int status, String message) {
+        this.code = code;
         this.status = status;
         this.message = message;
     }

@@ -5,7 +5,7 @@ import kr.hhplus.be.server.domain.coupon.dto.IssueCouponResult;
 import kr.hhplus.be.server.domain.coupon.dto.UseCouponResult;
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
 import kr.hhplus.be.server.domain.coupon.model.IssuedCoupon;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +26,10 @@ public class CouponService {
     @Transactional
     public IssueCouponResult issueWithLock(IssueCouponCommand command) {
         Coupon coupon = couponRepository.findByIdWithLock(command.couponId())
-                .orElseThrow(() -> new DomainException(CouponErrorCode.COUPON_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(CouponErrorCode.COUPON_NOT_FOUND));
 
         if (issuedCouponRepository.existsByCouponIdAndUserId(command.couponId(), command.userId())) {
-            throw new DomainException(CouponErrorCode.COUPON_ALREADY_ISSUED);
+            throw new BusinessException(CouponErrorCode.COUPON_ALREADY_ISSUED);
         }
 
         IssuedCoupon issuedCoupon = coupon.issue(command.userId());

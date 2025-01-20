@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.coupon.model;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.coupon.CouponErrorCode;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import kr.hhplus.be.server.global.model.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -43,7 +43,7 @@ public class Coupon extends BaseEntity {
 
     private void validateRemainingQuantity() {
         if (totalQuantity <= 0) {
-            throw new DomainException(CouponErrorCode.COUPON_STOCK_DEPLETED);
+            throw new BusinessException(CouponErrorCode.COUPON_STOCK_DEPLETED);
         }
     }
 
@@ -59,13 +59,13 @@ public class Coupon extends BaseEntity {
     private void validatePeriod() {
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(validFrom) || now.isAfter(validUntil)) {
-            throw new DomainException(CouponErrorCode.COUPON_INVALID);
+            throw new BusinessException(CouponErrorCode.COUPON_INVALID);
         }
     }
 
     private void validateMinimumOrderAmount(Long orderAmount) {
         if (minOrderAmount != null && orderAmount < minOrderAmount) {
-            throw new DomainException(CouponErrorCode.COUPON_NOT_APPLICABLE_TO_PAYMENT);
+            throw new BusinessException(CouponErrorCode.COUPON_NOT_APPLICABLE_TO_PAYMENT);
         }
     }
 

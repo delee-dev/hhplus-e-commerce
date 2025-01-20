@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.user;
 
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class UserServiceTest {
 
             // when & then
             assertThatThrownBy(() -> userService.getUser(nonExistentUserId))
-                    .isInstanceOf(DomainException .class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(UserErrorCode.USER_NOT_FOUND.getMessage());
         }
     }

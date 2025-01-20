@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.coupon;
 
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class CouponTest {
 
             // when & then
             assertThatThrownBy(() -> couponWithoutStock.issue(userId))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(CouponErrorCode.COUPON_STOCK_DEPLETED.getMessage());
         }
 
@@ -52,7 +52,7 @@ public class CouponTest {
 
             // when & then
             assertThatThrownBy(() -> expiredCoupon.validateUsage(VALID_ORDER_AMOUNT))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(CouponErrorCode.COUPON_INVALID.getMessage());
         }
 
@@ -64,7 +64,7 @@ public class CouponTest {
 
             // when & then
             assertThatThrownBy(() -> coupon.validateUsage(belowMinOrderAmount))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(CouponErrorCode.COUPON_NOT_APPLICABLE_TO_PAYMENT.getMessage());
         }
     }

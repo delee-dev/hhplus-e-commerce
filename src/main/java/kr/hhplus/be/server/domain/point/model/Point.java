@@ -2,7 +2,7 @@ package kr.hhplus.be.server.domain.point.model;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.point.PointErrorCode;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import kr.hhplus.be.server.global.model.BaseEntity;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
@@ -42,13 +42,13 @@ public class Point extends BaseEntity {
 
     private void validateMinimumChargeAmount(Long amount) {
         if (amount < MINIMUM_CHARGE_POINT) {
-            throw new DomainException(PointErrorCode.POINT_CHARGE_BELOW_MINIMUM);
+            throw new BusinessException(PointErrorCode.POINT_CHARGE_BELOW_MINIMUM);
         }
     }
 
     private void validateMaximumChargeAmount(Long amount) {
         if (amount > MAXIMUM_CHARGE_POINT) {
-            throw new DomainException(PointErrorCode.POINT_CHARGE_EXCEEDS_MAXIMUM);
+            throw new BusinessException(PointErrorCode.POINT_CHARGE_EXCEEDS_MAXIMUM);
         }
     }
 
@@ -56,7 +56,7 @@ public class Point extends BaseEntity {
         long amountAfterCharge = balance + amount;
 
         if (amountAfterCharge > MAXIMUM_BALANCE) {
-            throw new DomainException(PointErrorCode.POINT_BALANCE_EXCEEDS_LIMIT);
+            throw new BusinessException(PointErrorCode.POINT_BALANCE_EXCEEDS_LIMIT);
         }
     }
 
@@ -67,7 +67,7 @@ public class Point extends BaseEntity {
 
     private void validateSufficiency(Long amount) {
         if (balance < amount) {
-            throw new DomainException(PointErrorCode.POINT_BALANCE_INSUFFICIENT);
+            throw new BusinessException(PointErrorCode.POINT_BALANCE_INSUFFICIENT);
         }
     }
 }

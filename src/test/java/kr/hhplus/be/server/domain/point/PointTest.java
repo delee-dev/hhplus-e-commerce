@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.point;
 
 import kr.hhplus.be.server.domain.point.model.Point;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ public class PointTest {
 
             // when & then
             assertThatThrownBy(() -> point.charge(BELOW_MIN_CHARGE_AMOUNT))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(PointErrorCode.POINT_CHARGE_BELOW_MINIMUM.getMessage());
         }
 
@@ -32,7 +32,7 @@ public class PointTest {
 
             // when & then
             assertThatThrownBy(() -> point.charge(EXCEED_MAX_CHARGE_AMOUNT))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(PointErrorCode.POINT_CHARGE_EXCEEDS_MAXIMUM.getMessage());
         }
 
@@ -43,7 +43,7 @@ public class PointTest {
 
             // when & then
             assertThatThrownBy(() -> pointNearLimit.charge(VALID_CHARGE_AMOUNT))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(PointErrorCode.POINT_BALANCE_EXCEEDS_LIMIT.getMessage());
         }
 
@@ -75,7 +75,7 @@ public class PointTest {
 
             // when & then
             assertThatThrownBy(() -> point.use(exceedBalance))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(PointErrorCode.POINT_BALANCE_INSUFFICIENT.getMessage());
         }
 

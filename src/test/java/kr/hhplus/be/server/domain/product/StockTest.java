@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.product;
 
 import kr.hhplus.be.server.domain.product.model.Stock;
-import kr.hhplus.be.server.global.exception.DomainException;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ public class StockTest {
 
             // when & then
             assertThatThrownBy(() -> stock.deduct(quantity + 1))
-                    .isInstanceOf(DomainException.class)
+                    .isInstanceOf(BusinessException.class)
                     .hasMessage(ProductErrorCode.PRODUCT_OUT_OF_STOCK.getMessage());
         }
 

@@ -331,7 +331,7 @@ public class PaymentFacadeIntegrationTest {
             PaymentCommand command = new PaymentCommand(userId, orderId, Optional.empty());
 
             // when & then
-            int threadCount = 2;
+            int threadCount = 3;
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             CountDownLatch latch = new CountDownLatch(threadCount);
 
@@ -359,7 +359,7 @@ public class PaymentFacadeIntegrationTest {
 
             // then
             assertThat(successCount.get()).isEqualTo(1);
-            assertThat(failureCount.get()).isEqualTo(1);
+            assertThat(failureCount.get()).isEqualTo(threadCount - 1);
         }
 
         @Test

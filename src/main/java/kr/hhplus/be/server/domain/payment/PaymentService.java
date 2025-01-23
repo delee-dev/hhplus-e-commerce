@@ -16,7 +16,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment getPaymentByOrderIdWithLock(Long orderId) {
-        return paymentRepository.findByOrderIdWithLock(orderId);
+    public Payment getPaymentByOrderId(Long orderId) {
+        return paymentRepository.findByOrderId(orderId);
     }
 }

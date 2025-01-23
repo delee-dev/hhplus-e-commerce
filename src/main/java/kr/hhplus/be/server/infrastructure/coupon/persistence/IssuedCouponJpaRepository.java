@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface IssuedCouponJpaRepository extends JpaRepository<IssuedCoupon, Long> {
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Lock(LockModeType.OPTIMISTIC)
     IssuedCoupon findByUserIdAndCoupon_Id(Long userId, Long couponId);
     boolean existsByUserIdAndCoupon_Id(Long userId, Long couponId);
 }

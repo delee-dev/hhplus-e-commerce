@@ -128,6 +128,7 @@ create table issued_coupons
     user_id    bigint                     not null,
     status     enum ('AVAILABLE', 'USED') not null,
     used_at    datetime(6)                null,
+    version    bigint default 0           ,
     created_at datetime(6)                null,
     updated_at datetime(6)                null,
     constraint uk_issued_coupon_coupon_user unique (coupon_id, user_id)

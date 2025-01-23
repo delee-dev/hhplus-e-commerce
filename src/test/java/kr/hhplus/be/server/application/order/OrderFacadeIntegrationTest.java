@@ -138,18 +138,15 @@ public class OrderFacadeIntegrationTest {
     class OrderConcurrencyTest {
         @BeforeEach
         void setUp() {
-            User user1 = user();
-            User user2 = user();
-            User user3 = user();
-            userJpaRepository.saveAllAndFlush(List.of(user1, user2, user3));
+            for (int i = 0; i < 101; i ++) {
+                User user = user();
+                userJpaRepository.saveAndFlush(user);
 
-            Point point1 = point(user1);
-            Point point2 = point(user2);
-            Point point3 = point(user3);
-            pointJpaRepository.saveAllAndFlush(List.of(point1, point2, point3));
-            pointFacade.charge(user1.getId(), 100_000L);
-            pointFacade.charge(user2.getId(), 100_000L);
-            pointFacade.charge(user3.getId(), 100_000L);
+                Point point = point(user);
+                pointJpaRepository.saveAndFlush(point);
+
+                pointFacade.charge(user.getId(), 100_000L);
+            }
 
             Category category = category();
             categoryJapRepository.saveAndFlush(category);
@@ -157,7 +154,7 @@ public class OrderFacadeIntegrationTest {
             Product product = product(category, 10_000L);
             productJpaRepository.saveAndFlush(product);
 
-            Stock stock = stock(product, 2);
+            Stock stock = stock(product, 100);
             stockJpaRepository.saveAndFlush(stock);
         }
 
@@ -169,7 +166,7 @@ public class OrderFacadeIntegrationTest {
             int stockBeforeOrder = stockJpaRepository.findByProductId(productId).getQuantity();
 
             // when
-            int threadCount = 3;
+            int threadCount = 101;
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             CountDownLatch latch = new CountDownLatch(threadCount);
 

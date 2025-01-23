@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -30,11 +29,10 @@ public class ProductService {
     }
 
     @Transactional
-    public List<Product> deductStocksWithLock(List<DeductStockCommand> commands) {
+    public List<Product> deductStock(List<DeductStockCommand> commands) {
         return commands.stream()
-                .sorted(Comparator.comparing(DeductStockCommand::productId))
                 .map(command -> {
-                    Stock stock = stockRepository.findByProductIdWithLock(command.productId());
+                    Stock stock = stockRepository.findByProductId(command.productId());
                     int currentStock = stock.deduct(command.quantity());
 
                     Product product = stock.getProduct();

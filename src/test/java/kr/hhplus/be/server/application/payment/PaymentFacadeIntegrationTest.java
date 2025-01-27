@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -331,7 +332,7 @@ public class PaymentFacadeIntegrationTest {
             PaymentCommand command = new PaymentCommand(userId, orderId, Optional.empty());
 
             // when & then
-            int threadCount = 2;
+            int threadCount = 3;
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
             CountDownLatch latch = new CountDownLatch(threadCount);
 
@@ -359,7 +360,7 @@ public class PaymentFacadeIntegrationTest {
 
             // then
             assertThat(successCount.get()).isEqualTo(1);
-            assertThat(failureCount.get()).isEqualTo(1);
+            assertThat(failureCount.get()).isEqualTo(threadCount - 1);
         }
 
         @Test
@@ -385,10 +386,7 @@ public class PaymentFacadeIntegrationTest {
                 try {
                     paymentFacade.pay(command1);
                     successCount.getAndIncrement();
-                } catch (BusinessException e) {
-                    assertThat(e)
-                            .isInstanceOf(BusinessException.class)
-                            .hasMessage(CouponErrorCode.COUPON_ALREADY_USED.getMessage());
+                } catch (OptimisticLockingFailureException e) {
                     failureCount.getAndIncrement();
                 } finally {
                     latch.countDown();
@@ -398,10 +396,7 @@ public class PaymentFacadeIntegrationTest {
                 try {
                     paymentFacade.pay(command2);
                     successCount.getAndIncrement();
-                } catch (BusinessException e) {
-                    assertThat(e)
-                            .isInstanceOf(BusinessException.class)
-                            .hasMessage(CouponErrorCode.COUPON_ALREADY_USED.getMessage());
+                } catch (OptimisticLockingFailureException e) {
                     failureCount.getAndIncrement();
                 } finally {
                     latch.countDown();
@@ -413,7 +408,7 @@ public class PaymentFacadeIntegrationTest {
 
             // then
             assertThat(successCount.get()).isEqualTo(1);
-            assertThat(failureCount.get()).isEqualTo(1);
+            assertThat(failureCount.get()).isEqualTo(threadCount - 1);
         }
     }
 }

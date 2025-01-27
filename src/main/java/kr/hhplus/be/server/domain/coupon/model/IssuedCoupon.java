@@ -7,6 +7,7 @@ import kr.hhplus.be.server.global.model.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
@@ -35,6 +36,9 @@ public class IssuedCoupon extends BaseEntity {
     @Column(nullable = false)
     private CouponStatus status;
     private LocalDateTime used_at;
+    @Version
+    @ColumnDefault("0")
+    private Long version;
 
     public IssuedCoupon(Coupon coupon, Long userId) {
         this.coupon = coupon;

@@ -198,7 +198,7 @@ public class ProductServiceIntegrationTest {
             List<DeductStockCommand> commands = List.of(new DeductStockCommand(productId, quantity));
 
             // when
-            productService.deductStocksWithLock(commands);
+            productService.deductStock(commands);
 
             // then
             int actualQuantity = stockJpaRepository.findByProductId(productId).getQuantity();
@@ -214,97 +214,11 @@ public class ProductServiceIntegrationTest {
             List<DeductStockCommand> commands = List.of(new DeductStockCommand(productId, quantity));
 
             // when
-            productService.deductStocksWithLock(commands);
+            productService.deductStock(commands);
 
             // then
             SaleStatus actualStatus = productJpaRepository.findById(productId).get().getStatus();
             assertThat(actualStatus).isEqualTo(SaleStatus.TEMPORARILY_OUT);
-        }
-    }
-
-    @Nested
-    @DisplayName("재고 차감 동시성 테스트")
-    class DeductStockConcurrencyTest {
-        @BeforeEach
-        void setUp() {
-            Category category = category();
-            categoryJapRepository.saveAndFlush(category);
-
-            Product product = product(category);
-            productJpaRepository.saveAndFlush(product);
-
-            Stock stock = stock(product, 10);
-            stockJpaRepository.saveAndFlush(stock);
-        }
-
-        @Test
-        void 동시에_동일한_상품의_재고_차감을_요청하는_경우_한_번에_하나씩_처리된다() throws InterruptedException {
-            // given
-            long productId = 1L;
-            int quantity = 1;
-            int requestCount = 2;
-
-            int beforeQuantity = stockJpaRepository.findByProductId(productId).getQuantity();
-            int expectedQuantity = beforeQuantity - quantity * requestCount;
-
-            // when
-            ExecutorService executor = Executors.newFixedThreadPool(requestCount);
-            CountDownLatch latch = new CountDownLatch(requestCount);
-
-            List<DeductStockCommand> commands = List.of(new DeductStockCommand(productId, quantity));
-
-            for (int i = 0; i < requestCount; i++) {
-                executor.execute(() -> {
-                    productService.deductStocksWithLock(commands);
-                    latch.countDown();
-                });
-            }
-
-            latch.await();
-            executor.shutdown();
-
-            // then
-            int actualQuantity = stockJpaRepository.findByProductId(productId).getQuantity();
-            assertThat(actualQuantity).isEqualTo(expectedQuantity);
-        }
-
-        @Test
-        void 동시에_동일한_상품의_재고_차감을_요청하는_경우_재고가_부족하면_예외가_발생한다() throws InterruptedException {
-            // given
-            long productId = 1L;
-            int quantity = 7;
-
-            int beforeQuantity = stockJpaRepository.findByProductId(productId).getQuantity();
-            int expectedQuantity = beforeQuantity - quantity;
-
-            // when & then
-            int requestCount = 2;
-            ExecutorService executor = Executors.newFixedThreadPool(requestCount);
-            CountDownLatch latch = new CountDownLatch(requestCount);
-            AtomicInteger successCount = new AtomicInteger(0);
-
-            List<DeductStockCommand> commands = List.of(new DeductStockCommand(productId, quantity));
-
-            for (int i = 0; i < requestCount; i++) {
-                executor.execute(() -> {
-                    try {
-                        productService.deductStocksWithLock(commands);
-                        successCount.incrementAndGet();
-                    } catch (BusinessException e) {
-                        assertThat(e.getErrorCode()).isEqualTo(ProductErrorCode.PRODUCT_OUT_OF_STOCK);
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-
-            latch.await();
-            executor.shutdown();
-
-            // then
-            int actualQuantity = stockJpaRepository.findByProductId(productId).getQuantity();
-            assertThat(actualQuantity).isEqualTo(expectedQuantity);
-            assertThat(successCount.get()).isEqualTo(1);
         }
     }
 }

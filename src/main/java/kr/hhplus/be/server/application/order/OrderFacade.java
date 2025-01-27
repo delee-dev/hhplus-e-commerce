@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.application.order;
 
-import jakarta.transaction.Transactional;
 import kr.hhplus.be.server.application.order.dto.OrderCommand;
 import kr.hhplus.be.server.application.order.dto.OrderResult;
 import kr.hhplus.be.server.domain.order.OrderService;
@@ -10,6 +9,8 @@ import kr.hhplus.be.server.domain.payment.model.Payment;
 import kr.hhplus.be.server.domain.product.ProductService;
 import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.domain.user.UserService;
+import kr.hhplus.be.server.global.lock.DistributedLockManager;
+import kr.hhplus.be.server.global.lock.LockKeyGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,21 +23,27 @@ public class OrderFacade {
     private final ProductService productService;
     private final UserService userService;
     private final PaymentService paymentService;
+    private final DistributedLockManager lockManager;
 
-    @Transactional
     public OrderResult order(OrderCommand command) {
-        // 유저 조회
-        userService.getUser(command.userId());
+        List<String> keys = command.orderItems().stream()
+                .map(orderItem -> LockKeyGenerator.generate("order", List.of(orderItem.productId())))
+                .toList();
 
-        // 재고 차감
-        List<Product> products = productService.deductStocksWithLock(command.toDeductStockCommands());
+        return lockManager.withLock(keys, () -> {
+            // 유저 조회
+            userService.getUser(command.userId());
 
-        // 주문 생성
-        Order order = orderService.createOrder(command.toCreateOrderCommand(products));
+            // 재고 차감
+            List<Product> products = productService.deductStock(command.toDeductStockCommands());
 
-        // 결제 생성
-        Payment payment = paymentService.createPayment(order.getId(), order.getTotalAmount());
+            // 주문 생성
+            Order order = orderService.createOrder(command.toCreateOrderCommand(products));
 
-        return OrderResult.from(order, payment);
+            // 결제 생성
+            Payment payment = paymentService.createPayment(order.getId(), order.getTotalAmount());
+
+            return OrderResult.from(order, payment);
+        });
     }
 }

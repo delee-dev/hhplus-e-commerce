@@ -11,4 +11,4 @@
 https://app.swaggerhub.com/apis/DELEEDEV/e-commerce/1.0.0#/Product%20API/getProductsByCategory
 
 ## Others
-- [동시성 처리](docs/6.Others/동시성/README.md)
+- [동시성 처리](docs/5.Others/동시성/README.md)

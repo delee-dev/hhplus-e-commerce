@@ -53,4 +53,11 @@ public class CouponService {
     private void rollbackQuantity(Long couponId) {
         couponIssuanceManager.increaseAndGetQuantity(couponId);
     }
+
+    @Transactional(readOnly = true)
+    public void initializeCouponQuantity(Long couponId) {
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(() -> new BusinessException(CouponErrorCode.COUPON_NOT_FOUND));
+        couponIssuanceManager.initializeQuantity(couponId, coupon.getTotalQuantity());
+    }
 }

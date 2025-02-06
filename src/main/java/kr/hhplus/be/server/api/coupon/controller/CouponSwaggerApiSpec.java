@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.api.coupon.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +14,8 @@ import kr.hhplus.be.server.api.coupon.dto.IssueCouponRequest;
 import kr.hhplus.be.server.api.coupon.dto.IssueCouponResponse;
 import kr.hhplus.be.server.global.exception.ErrorResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Tag(name = "Coupon API", description = "쿠폰 API")
 public interface CouponSwaggerApiSpec {
@@ -71,4 +74,31 @@ public interface CouponSwaggerApiSpec {
                     required = true,
                     content = @Content(schema = @Schema(implementation = IssueCouponRequest.class))
             ) IssueCouponRequest request);
+
+
+    @Operation(
+            summary = "쿠폰 수량 초기화",
+            description = "Redis에 쿠폰의 수량 정보를 초기화합니다. 쿠폰 엔티티에 설정된 총 수량으로 초기화됩니다.",
+            tags = {"Coupon API"}
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "수량 초기화 성공"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "쿠폰이 모두 소진된 경우",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                        {
+                                            "code": 404,
+                                            "message": "존재하지 않는 쿠폰입니다."
+                                        }
+                                    """
+                            ))),
+    })
+    ResponseEntity<Void> initializeQuantity(@Parameter(description = "쿠폰 ID", example = "1") Long couponId);
 }

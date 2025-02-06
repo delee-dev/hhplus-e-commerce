@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.coupon.integration;
 
 import kr.hhplus.be.server.domain.coupon.CouponErrorCode;
+import kr.hhplus.be.server.domain.coupon.CouponIssuanceManager;
 import kr.hhplus.be.server.domain.coupon.CouponService;
 import kr.hhplus.be.server.domain.coupon.dto.IssueCouponCommand;
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
@@ -47,6 +48,8 @@ public class CouponIntegrationTest {
     private IssuedCouponJpaRepository issuedCouponJpaRepository;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private CouponIssuanceManager couponIssuanceManager;
 
     @Nested
     @DisplayName("쿠폰 발행 기능")
@@ -143,6 +146,38 @@ public class CouponIntegrationTest {
                     })
                     .findFirst().get();
             assertThat(actualCoupon.getStatus()).isEqualTo(CouponStatus.USED);
+        }
+    }
+
+    @Nested
+    @DisplayName("쿠폰 수량 초기화 기능")
+    class InitializeCouponQuantityTest {
+        @BeforeEach
+        void setUp() {
+            Coupon coupon = coupon(100);
+            couponJpaRepository.saveAndFlush(coupon);
+
+            RAtomicLong quantity = redissonClient.getAtomicLong(String.join(":", "coupon:quantity", coupon.getId().toString()));
+            quantity.delete();
+
+            RSet<Long> issuedUserSet = redissonClient.getSet(String.join(":", "coupon:issued", coupon.getId().toString()));
+            issuedUserSet.delete();
+        }
+
+        @Test
+        void 쿠폰이_수량이_초기화되면_쿠폰의_저장된_총_수량만큼_저장소에_초기화된다() {
+            // given
+            Long couponId = 1L;
+            int quantityBeforeInitialize = couponIssuanceManager.getQuantity(couponId);
+            int expectedQuantity = couponJpaRepository.findById(couponId).get().getTotalQuantity();
+
+            // when
+            couponService.initializeCouponQuantity(couponId);
+
+            // then
+            int actualQuantity = couponIssuanceManager.getQuantity(couponId);
+            assertThat(quantityBeforeInitialize).isEqualTo(0);
+            assertThat(actualQuantity).isEqualTo(expectedQuantity);
         }
     }
 

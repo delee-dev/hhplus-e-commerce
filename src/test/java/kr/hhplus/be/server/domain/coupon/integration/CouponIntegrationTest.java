@@ -1,11 +1,13 @@
 package kr.hhplus.be.server.domain.coupon.integration;
 
+import kr.hhplus.be.server.domain.coupon.CouponErrorCode;
 import kr.hhplus.be.server.domain.coupon.CouponService;
 import kr.hhplus.be.server.domain.coupon.dto.IssueCouponCommand;
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
 import kr.hhplus.be.server.domain.coupon.model.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.model.IssuedCoupon;
 import kr.hhplus.be.server.domain.user.model.User;
+import kr.hhplus.be.server.global.exception.BusinessException;
 import kr.hhplus.be.server.infrastructure.coupon.persistence.CouponJpaRepository;
 import kr.hhplus.be.server.infrastructure.coupon.persistence.IssuedCouponJpaRepository;
 import kr.hhplus.be.server.infrastructure.user.persistence.UserJpaRepository;
@@ -13,6 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RAtomicLong;
+import org.redisson.api.RSet;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -40,6 +45,8 @@ public class CouponIntegrationTest {
     private UserJpaRepository userJpaRepository;
     @Autowired
     private IssuedCouponJpaRepository issuedCouponJpaRepository;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Nested
     @DisplayName("쿠폰 발행 기능")
@@ -51,6 +58,14 @@ public class CouponIntegrationTest {
 
             Coupon coupon = coupon(100);
             couponJpaRepository.saveAndFlush(coupon);
+
+            RAtomicLong quantity = redissonClient.getAtomicLong(String.join(":", "coupon:quantity", coupon.getId().toString()));
+            quantity.delete();
+
+            RSet<Long> issuedUserSet = redissonClient.getSet(String.join(":", "coupon:issued", coupon.getId().toString()));
+            issuedUserSet.delete();
+
+            couponService.initializeCouponQuantity(coupon.getId());
         }
 
         @Test
@@ -64,7 +79,7 @@ public class CouponIntegrationTest {
 
             // when
             IssueCouponCommand command = new IssueCouponCommand(couponId, userId);
-            couponService.issueWithLock(command);
+            couponService.issue(command);
 
             // then
             int actualQuantity = couponJpaRepository.findById(couponId).get().getTotalQuantity();
@@ -79,7 +94,7 @@ public class CouponIntegrationTest {
 
             // when
             IssueCouponCommand command = new IssueCouponCommand(couponId, userId);
-            couponService.issueWithLock(command);
+            couponService.issue(command);
 
             // then
             boolean existsIssuedCoupon = issuedCouponJpaRepository.existsByUserIdAndCoupon_Id(userId, couponId);
@@ -98,8 +113,16 @@ public class CouponIntegrationTest {
             Coupon coupon = coupon(100);
             couponJpaRepository.saveAndFlush(coupon);
 
+            RAtomicLong quantity = redissonClient.getAtomicLong(String.join(":", "coupon:quantity", coupon.getId().toString()));
+            quantity.delete();
+
+            RSet<Long> issuedUserSet = redissonClient.getSet(String.join(":", "coupon:issued", coupon.getId().toString()));
+            issuedUserSet.delete();
+
+            couponService.initializeCouponQuantity(coupon.getId());
+
             IssueCouponCommand command = new IssueCouponCommand(coupon.getId(), user.getId());
-            couponService.issueWithLock(command);
+            couponService.issue(command);
         }
 
         @Test
@@ -133,15 +156,23 @@ public class CouponIntegrationTest {
                 userJpaRepository.saveAndFlush(user);
             }
 
-            Coupon coupon = coupon(100);
+            Coupon coupon = coupon(30);
             couponJpaRepository.saveAndFlush(coupon);
+
+            RAtomicLong quantity = redissonClient.getAtomicLong(String.join(":", "coupon:quantity", coupon.getId().toString()));
+            quantity.delete();
+
+            RSet<Long> issuedUserSet = redissonClient.getSet(String.join(":", "coupon:issued", coupon.getId().toString()));
+            issuedUserSet.delete();
+
+            couponService.initializeCouponQuantity(coupon.getId());
         }
 
         @Test
         void 여러_사용자가_동시에_쿠폰_발급을_요청하는_경우_한_번에_하나씩_처리된다() throws InterruptedException {
             // given
             Long couponId = 1L;
-            int requestCount = 30;
+            int requestCount = 20;
 
             int quantityBeforeIssue = couponJpaRepository.findById(couponId).get().getTotalQuantity();
             int expected = quantityBeforeIssue - requestCount;
@@ -156,7 +187,7 @@ public class CouponIntegrationTest {
                 executor.execute(() -> {
                     try {
                         IssueCouponCommand command = new IssueCouponCommand(couponId, userId.getAndIncrement());
-                        couponService.issueWithLock(command);
+                        couponService.issue(command);
                     } finally {
                         latch.countDown();
                     }
@@ -169,6 +200,79 @@ public class CouponIntegrationTest {
             // then
             int quantityAfterIssue = couponJpaRepository.findById(couponId).get().getTotalQuantity();
             assertThat(quantityAfterIssue).isEqualTo(expected);
+        }
+
+        @Test
+        void 동일한_사용자가_쿠폰_발급을_여러_번_요청하는_경우_하나의_쿠폰만_발급된다() throws InterruptedException {
+            Long couponId = 1L;
+            Long userId = 1L;
+            int requestCount = 3;
+
+            // when
+            ExecutorService executor = Executors.newFixedThreadPool(requestCount);
+            CountDownLatch latch = new CountDownLatch(requestCount);
+
+            AtomicInteger successCount = new AtomicInteger(0);
+            AtomicInteger failureCount = new AtomicInteger(0);
+
+            for (int i = 0; i < requestCount; i++) {
+                executor.execute(() -> {
+                    try {
+                        IssueCouponCommand command = new IssueCouponCommand(couponId, userId);
+                        couponService.issue(command);
+                        successCount.incrementAndGet();
+                    } catch (BusinessException e) {
+                        assertThat(e.getMessage()).isEqualTo(CouponErrorCode.COUPON_ALREADY_ISSUED.getMessage());
+                        failureCount.incrementAndGet();
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+
+            latch.await();
+            executor.shutdown();
+
+            // then
+            int expectedSuccessCount = 1;
+            int expectedFailureCount = requestCount - 1;
+
+            assertThat(successCount.get()).isEqualTo(expectedSuccessCount);
+            assertThat(failureCount.get()).isEqualTo(expectedFailureCount);
+        }
+
+        @Test
+        void 잔여_수량을_초과하는_수의_요청이_오면_수량만큼만_성공한다() throws InterruptedException {
+            // given
+            Long couponId = 1L;
+            int requestCount = 40;
+
+            int quantityBeforeIssue = couponJpaRepository.findById(couponId).get().getTotalQuantity();
+
+            // when
+            ExecutorService executor = Executors.newFixedThreadPool(requestCount);
+            CountDownLatch latch = new CountDownLatch(requestCount);
+
+            AtomicLong userId = new AtomicLong(1L);
+
+            for (int i = 0; i < requestCount; i++) {
+                executor.execute(() -> {
+                    try {
+                        IssueCouponCommand command = new IssueCouponCommand(couponId, userId.getAndIncrement());
+                        couponService.issue(command);
+                    } catch (BusinessException e) {
+                        assertThat(e.getMessage()).isEqualTo(CouponErrorCode.COUPON_STOCK_DEPLETED.getMessage());
+                    } finally {
+                        latch.countDown();
+                    }
+                });
+            }
+
+            latch.await();
+            executor.shutdown();
+
+            // then
+            assertThat(issuedCouponJpaRepository.findAll().size()).isEqualTo(quantityBeforeIssue);
         }
 
     }
@@ -184,8 +288,16 @@ public class CouponIntegrationTest {
             Coupon coupon = coupon(100);
             couponJpaRepository.saveAndFlush(coupon);
 
+            RAtomicLong quantity = redissonClient.getAtomicLong(String.join(":", "coupon:quantity", coupon.getId().toString()));
+            quantity.delete();
+
+            RSet<Long> issuedUserSet = redissonClient.getSet(String.join(":", "coupon:issued", coupon.getId().toString()));
+            issuedUserSet.delete();
+
+            couponService.initializeCouponQuantity(coupon.getId());
+
             IssueCouponCommand command = new IssueCouponCommand(coupon.getId(), user.getId());
-            couponService.issueWithLock(command);
+            couponService.issue(command);
         }
 
         @Test

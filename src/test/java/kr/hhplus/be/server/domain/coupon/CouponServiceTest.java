@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.coupon;
 
 import kr.hhplus.be.server.domain.coupon.dto.IssueCouponCommand;
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
+import kr.hhplus.be.server.domain.coupon.model.IssuedCoupon;
 import kr.hhplus.be.server.global.exception.BusinessException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,8 @@ public class CouponServiceTest {
     private CouponRepository couponRepository;
     @Mock
     private IssuedCouponRepository issuedCouponRepository;
+    @Mock
+    private CouponIssuanceManager couponIssuanceManager;
 
     @Nested
     class IssueCouponTest {
@@ -35,13 +38,31 @@ public class CouponServiceTest {
             long nonExistentCouponId = 99L;
             IssueCouponCommand command = new IssueCouponCommand(nonExistentCouponId, userId);
 
-            when(couponRepository.findByIdWithLock(command.couponId()))
+            when(couponRepository.findById(command.couponId()))
                     .thenReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> couponService.issueWithLock(command))
+            assertThatThrownBy(() -> couponService.issue(command))
                     .isInstanceOf(BusinessException.class)
                     .hasMessage(CouponErrorCode.COUPON_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        void 쿠폰_개수_차감_후_잔여_수량이_0보다_작으면_쿠폰_발급에_실패한다() {
+            // given
+            long userId = 1L;
+            Coupon coupon = coupon();
+            IssueCouponCommand command = new IssueCouponCommand(coupon.getId(), userId);
+
+            when(couponRepository.findById(command.couponId()))
+                    .thenReturn(Optional.of(coupon));
+            when(couponIssuanceManager.decreaseAndGetQuantity(coupon.getId()))
+                    .thenReturn(-1);
+
+            // when & then
+            assertThatThrownBy(() -> couponService.issue(command))
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessage(CouponErrorCode.COUPON_STOCK_DEPLETED.getMessage());
         }
 
         @Test
@@ -51,13 +72,15 @@ public class CouponServiceTest {
             Coupon coupon = coupon();
             IssueCouponCommand command = new IssueCouponCommand(coupon.getId(), userId);
 
-            when(couponRepository.findByIdWithLock(command.couponId()))
+            when(couponRepository.findById(command.couponId()))
                     .thenReturn(Optional.of(coupon));
-            when(issuedCouponRepository.existsByCouponIdAndUserId(command.couponId(), command.userId()))
-                    .thenReturn(true);
+            when(couponIssuanceManager.decreaseAndGetQuantity(coupon.getId()))
+                    .thenReturn(50);
+            when(couponIssuanceManager.saveIssuedUser(coupon.getId(), userId))
+                    .thenReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> couponService.issueWithLock(command))
+            assertThatThrownBy(() -> couponService.issue(command))
                     .isInstanceOf(BusinessException.class)
                     .hasMessage(CouponErrorCode.COUPON_ALREADY_ISSUED.getMessage());
         }
@@ -68,14 +91,19 @@ public class CouponServiceTest {
             long userId = 1L;
             Coupon coupon = coupon();
             IssueCouponCommand command = new IssueCouponCommand(coupon.getId(), userId);
+            IssuedCoupon expectedIssuedCoupon = new IssuedCoupon(coupon, userId);
 
-            when(couponRepository.findByIdWithLock(command.couponId()))
+            when(couponRepository.findById(command.couponId()))
                     .thenReturn(Optional.of(coupon));
-            when(issuedCouponRepository.existsByCouponIdAndUserId(command.couponId(), command.userId()))
-                    .thenReturn(false);
+            when(couponIssuanceManager.decreaseAndGetQuantity(coupon.getId()))
+                    .thenReturn(50);
+            when(couponIssuanceManager.saveIssuedUser(coupon.getId(), userId))
+                    .thenReturn(true);
+            when(issuedCouponRepository.save(any(IssuedCoupon.class)))
+                    .thenReturn(expectedIssuedCoupon);
 
             // when
-            couponService.issueWithLock(command);
+            couponService.issue(command);
 
             // then
             verify(issuedCouponRepository, times(1))

@@ -37,6 +37,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RAtomicLong;
+import org.redisson.api.RSet;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -90,6 +93,8 @@ public class PaymentFacadeIntegrationTest {
     private CouponJpaRepository couponJpaRepository;
     @Autowired
     private IssuedCouponJpaRepository issuedCouponJpaRepository;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Nested
     @DisplayName("기본 결제 기능")
@@ -207,8 +212,16 @@ public class PaymentFacadeIntegrationTest {
             Coupon coupon = coupon(100);
             couponJpaRepository.saveAndFlush(coupon);
 
+            RAtomicLong quantity = redissonClient.getAtomicLong(String.join(":", "coupon:quantity", coupon.getId().toString()));
+            quantity.delete();
+
+            RSet<Long> issuedUserSet = redissonClient.getSet(String.join(":", "coupon:issued", coupon.getId().toString()));
+            issuedUserSet.delete();
+
+            couponService.initializeCouponQuantity(coupon.getId());
+
             IssueCouponCommand issueCouponCommand = new IssueCouponCommand(user.getId(), coupon.getId());
-            couponService.issueWithLock(issueCouponCommand);
+            couponService.issue(issueCouponCommand);
         }
 
         @Test
@@ -257,8 +270,16 @@ public class PaymentFacadeIntegrationTest {
             Coupon coupon = coupon(100);
             couponJpaRepository.saveAndFlush(coupon);
 
+            RAtomicLong quantity = redissonClient.getAtomicLong(String.join(":", "coupon:quantity", coupon.getId().toString()));
+            quantity.delete();
+
+            RSet<Long> issuedUserSet = redissonClient.getSet(String.join(":", "coupon:issued", coupon.getId().toString()));
+            issuedUserSet.delete();
+
+            couponService.initializeCouponQuantity(coupon.getId());
+
             IssueCouponCommand issueCouponCommand = new IssueCouponCommand(user.getId(), coupon.getId());
-            couponService.issueWithLock(issueCouponCommand);
+            couponService.issue(issueCouponCommand);
         }
 
         @Test
@@ -319,8 +340,16 @@ public class PaymentFacadeIntegrationTest {
             Coupon coupon = coupon(100);
             couponJpaRepository.saveAndFlush(coupon);
 
+            RAtomicLong quantity = redissonClient.getAtomicLong(String.join(":", "coupon:quantity", coupon.getId().toString()));
+            quantity.delete();
+
+            RSet<Long> issuedUserSet = redissonClient.getSet(String.join(":", "coupon:issued", coupon.getId().toString()));
+            issuedUserSet.delete();
+
+            couponService.initializeCouponQuantity(coupon.getId());
+
             IssueCouponCommand issueCouponCommand = new IssueCouponCommand(user1.getId(), coupon.getId());
-            couponService.issueWithLock(issueCouponCommand);
+            couponService.issue(issueCouponCommand);
         }
 
         @Test

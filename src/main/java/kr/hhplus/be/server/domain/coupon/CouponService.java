@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CouponService {
     private final IssuedCouponRepository issuedCouponRepository;
     private final CouponRepository couponRepository;
+    private final CouponIssuanceManager couponIssuanceManager;
 
     @Transactional
     public UseCouponResult useWithLock(Long couponId, Long userId, Long orderAmount) {
@@ -25,17 +26,31 @@ public class CouponService {
     }
 
     @Transactional
-    public IssueCouponResult issueWithLock(IssueCouponCommand command) {
-        Coupon coupon = couponRepository.findByIdWithLock(command.couponId())
+    public IssueCouponResult issue(IssueCouponCommand command) {
+        Coupon coupon = couponRepository.findById(command.couponId())
                 .orElseThrow(() -> new BusinessException(CouponErrorCode.COUPON_NOT_FOUND));
 
-        if (issuedCouponRepository.existsByCouponIdAndUserId(command.couponId(), command.userId())) {
+        // 쿠폰 수량 차감
+        if (couponIssuanceManager.decreaseAndGetQuantity(command.couponId()) < 0) {
+            rollbackQuantity(command.couponId());
+            throw new BusinessException(CouponErrorCode.COUPON_STOCK_DEPLETED);
+        }
+
+        // 쿠폰 발급자 저장
+        if (!couponIssuanceManager.saveIssuedUser(command.couponId(), command.userId())) {
+            rollbackQuantity(command.couponId());
             throw new BusinessException(CouponErrorCode.COUPON_ALREADY_ISSUED);
         }
 
-        IssuedCoupon issuedCoupon = coupon.issue(command.userId());
-        issuedCouponRepository.save(issuedCoupon);
+        // 발급된 쿠폰 저장
+        IssuedCoupon issuedCoupon = issuedCouponRepository.save(new IssuedCoupon(coupon, command.userId()));
 
+        // 쿠폰 잔여 수량 업데이트 (In DB)
+        coupon.updateQuantity(couponIssuanceManager.getQuantity(command.couponId()));
         return IssueCouponResult.from(issuedCoupon);
+    }
+
+    private void rollbackQuantity(Long couponId) {
+        couponIssuanceManager.increaseAndGetQuantity(couponId);
     }
 }

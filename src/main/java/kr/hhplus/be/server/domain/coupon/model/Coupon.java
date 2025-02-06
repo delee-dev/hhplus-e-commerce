@@ -35,20 +35,8 @@ public class Coupon extends BaseEntity {
     @Column(nullable = false)
     private int totalQuantity;
 
-    public IssuedCoupon issue(Long userId) {
-        validateRemainingQuantity();
-        decreaseQuantity();
-        return new IssuedCoupon(this, userId);
-    }
-
-    private void validateRemainingQuantity() {
-        if (totalQuantity <= 0) {
-            throw new BusinessException(CouponErrorCode.COUPON_STOCK_DEPLETED);
-        }
-    }
-
-    private void decreaseQuantity() {
-        totalQuantity --;
+    public void updateQuantity(int quantity) {
+        this.totalQuantity = quantity;
     }
 
     public void validateUsage(Long orderAmount) {

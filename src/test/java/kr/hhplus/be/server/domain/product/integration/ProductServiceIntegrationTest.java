@@ -3,6 +3,7 @@ package kr.hhplus.be.server.domain.product.integration;
 import kr.hhplus.be.server.domain.order.model.Order;
 import kr.hhplus.be.server.domain.payment.model.Payment;
 import kr.hhplus.be.server.domain.product.ProductErrorCode;
+import kr.hhplus.be.server.domain.product.ProductRepository;
 import kr.hhplus.be.server.domain.product.ProductService;
 import kr.hhplus.be.server.domain.product.dto.DeductStockCommand;
 import kr.hhplus.be.server.domain.product.dto.GetProductsQuery;
@@ -26,10 +27,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,6 +42,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static kr.hhplus.be.server.fixture.integration.Fixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @Sql("/clear.sql")
@@ -56,6 +65,10 @@ public class ProductServiceIntegrationTest {
     private PaymentJpaRepository paymentJpaRepository;
     @Autowired
     private UserJpaRepository userJpaRepository;
+    @Autowired
+    private CacheManager cacheManager;
+    @MockitoSpyBean
+    private ProductRepository productRepository;
 
 
     @Nested
@@ -146,7 +159,11 @@ public class ProductServiceIntegrationTest {
 
             List<Payment> payments = payments(orders);
             paymentJpaRepository.saveAllAndFlush(payments);
+
+            Objects.requireNonNull(cacheManager.getCache("bestSellers"))
+                    .evictIfPresent(category.getId());
         }
+
         @Test
         void 상위_판매_상품_리스트_조회() {
             // given
@@ -168,6 +185,62 @@ public class ProductServiceIntegrationTest {
             assertThat(result.get(2))
                     .extracting("id", "name")
                     .contains(1L, "무선이어폰");
+        }
+    }
+
+    @Nested
+    @DisplayName("상위 판매 상품 캐시")
+    class BestSellingProductsCache {
+        @BeforeEach
+        void setUp() {
+            User user = user();
+            userJpaRepository.saveAndFlush(user);
+
+            Category category = category();
+            categoryJapRepository.saveAndFlush(category);
+
+            List<Product> products = products(category);
+            productJpaRepository.saveAllAndFlush(products);
+
+            List<Order> orders = orders(user, products);
+            orderJpaRepository.saveAllAndFlush(orders);
+
+            List<Payment> payments = payments(orders);
+            paymentJpaRepository.saveAllAndFlush(payments);
+
+            Objects.requireNonNull(cacheManager.getCache("bestSellers"))
+                    .evictIfPresent(category.getId());
+        }
+
+        @Test
+        void 상위_판매_상품_조회_시_DB_접근은_한_번만_일어난다() {
+            // given
+            long categoryId = 1;
+
+            // when
+            productService.getBestSellingProducts(categoryId);
+            productService.getBestSellingProducts(categoryId);
+
+            // then
+            verify(productRepository, times(1))
+                    .findBestSellingProductsByCategory(eq(categoryId), anyInt(), anyInt());
+        }
+
+        @Test
+        void 상위_판매_상품_갱신_시_조회_결과가_캐시에_저장된다() {
+            // given
+            long categoryId = 1;
+
+            // when
+            List<ProductResult> results = productService.refreshBestSellingProducts(categoryId);
+
+            // then
+            Cache cache = cacheManager.getCache("bestSellers");
+            List<ProductResult> cachedResults = cache.get(categoryId, List.class);
+
+            assertThat(cachedResults)
+                    .isNotNull()
+                    .hasSameElementsAs(results);
         }
     }
 

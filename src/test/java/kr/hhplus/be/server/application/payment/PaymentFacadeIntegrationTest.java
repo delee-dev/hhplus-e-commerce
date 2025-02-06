@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -385,10 +386,10 @@ public class PaymentFacadeIntegrationTest {
                 try {
                     paymentFacade.pay(command1);
                     successCount.getAndIncrement();
+                } catch (OptimisticLockingFailureException e) {
+                    failureCount.getAndIncrement();
                 } catch (BusinessException e) {
-                    assertThat(e)
-                            .isInstanceOf(BusinessException.class)
-                            .hasMessage(CouponErrorCode.COUPON_ALREADY_USED.getMessage());
+                    assertThat(e.getMessage()).isEqualTo(CouponErrorCode.COUPON_ALREADY_USED.getMessage());
                     failureCount.getAndIncrement();
                 } finally {
                     latch.countDown();
@@ -398,10 +399,10 @@ public class PaymentFacadeIntegrationTest {
                 try {
                     paymentFacade.pay(command2);
                     successCount.getAndIncrement();
+                } catch (OptimisticLockingFailureException e) {
+                    failureCount.getAndIncrement();
                 } catch (BusinessException e) {
-                    assertThat(e)
-                            .isInstanceOf(BusinessException.class)
-                            .hasMessage(CouponErrorCode.COUPON_ALREADY_USED.getMessage());
+                    assertThat(e.getMessage()).isEqualTo(CouponErrorCode.COUPON_ALREADY_USED.getMessage());
                     failureCount.getAndIncrement();
                 } finally {
                     latch.countDown();
@@ -413,7 +414,7 @@ public class PaymentFacadeIntegrationTest {
 
             // then
             assertThat(successCount.get()).isEqualTo(1);
-            assertThat(failureCount.get()).isEqualTo(1);
+            assertThat(failureCount.get()).isEqualTo(threadCount - 1);
         }
     }
 }

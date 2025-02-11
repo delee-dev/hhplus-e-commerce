@@ -12,37 +12,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class CouponTest {
     @Nested
-    @DisplayName("쿠폰 발급")
-    class IssueCouponTest {
-        @Test
-        void 쿠폰_잔여_수량이_없으면_쿠폰_발급에_실패한다() {
-            // given
-            Long userId = 1L;
-            Coupon couponWithoutStock = couponWithoutStock();
-
-            // when & then
-            assertThatThrownBy(() -> couponWithoutStock.issue(userId))
-                    .isInstanceOf(BusinessException.class)
-                    .hasMessage(CouponErrorCode.COUPON_STOCK_DEPLETED.getMessage());
-        }
-
-        @Test
-        void 쿠폰_발급_시_잔여수량이_차감된다() {
-            // given
-            Long userId = 1L;
-            Coupon coupon = coupon();
-            int initialQuantity = coupon.getTotalQuantity();
-
-            // when
-            coupon.issue(userId);
-
-            // then
-            int actualQuantity = coupon.getTotalQuantity();
-            assertThat(actualQuantity).isEqualTo(initialQuantity - 1);
-        }
-    }
-
-    @Nested
     @DisplayName("쿠폰 사용 검증")
     class UseCouponTest {
         @Test

@@ -3,12 +3,16 @@ package kr.hhplus.be.server.api.coupon;
 import io.restassured.RestAssured;
 import kr.hhplus.be.server.api.BaseE2ETest;
 import kr.hhplus.be.server.api.coupon.dto.IssueCouponRequest;
+import kr.hhplus.be.server.domain.coupon.CouponService;
 import kr.hhplus.be.server.domain.coupon.model.Coupon;
 import kr.hhplus.be.server.domain.user.model.User;
 import kr.hhplus.be.server.infrastructure.coupon.persistence.CouponJpaRepository;
 import kr.hhplus.be.server.infrastructure.user.persistence.UserJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RAtomicLong;
+import org.redisson.api.RSet;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -22,6 +26,10 @@ public class CouponControllerE2ETest extends BaseE2ETest {
     private CouponJpaRepository couponJpaRepository;
     @Autowired
     private UserJpaRepository userJpaRepository;
+    @Autowired
+    private RedissonClient redissonClient;
+    @Autowired
+    private CouponService couponService;
 
     @BeforeEach
     void setUp() {
@@ -30,6 +38,14 @@ public class CouponControllerE2ETest extends BaseE2ETest {
 
         Coupon coupon = coupon(100);
         couponJpaRepository.saveAndFlush(coupon);
+
+        RAtomicLong quantity = redissonClient.getAtomicLong(String.join(":", "coupon:quantity", coupon.getId().toString()));
+        quantity.delete();
+
+        RSet<Long> issuedUserSet = redissonClient.getSet(String.join(":", "coupon:issued", coupon.getId().toString()));
+        issuedUserSet.delete();
+
+        couponService.initializeCouponQuantity(coupon.getId());
     }
 
     @Test

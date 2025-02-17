@@ -2,6 +2,7 @@ package kr.hhplus.be.server.application.payment;
 
 import jakarta.transaction.Transactional;
 import kr.hhplus.be.server.application.dataplatform.DataPlatformPort;
+import kr.hhplus.be.server.application.dataplatform.dto.PaymentInfo;
 import kr.hhplus.be.server.application.payment.dto.PaymentCommand;
 import kr.hhplus.be.server.application.payment.dto.PaymentResult;
 import kr.hhplus.be.server.domain.coupon.CouponService;
@@ -44,8 +45,8 @@ public class PaymentFacade {
         // 주문 상태 변경
         Order order = orderService.completePayment(payment.getOrderId());
 
-        PaymentResult result = PaymentResult.from(order, payment);
-        dataPlatformPort.call(result);
-        return result;
+        dataPlatformPort.sendPaymentInfo(PaymentInfo.from(payment));
+
+        return PaymentResult.from(order, payment);
     }
 }

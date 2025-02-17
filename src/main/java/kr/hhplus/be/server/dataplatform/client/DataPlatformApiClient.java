@@ -1,8 +1,8 @@
 package kr.hhplus.be.server.dataplatform.client;
 
-import kr.hhplus.be.server.dataplatform.client.dto.ApiRequest;
-import kr.hhplus.be.server.dataplatform.client.dto.ApiResponse;
+import kr.hhplus.be.server.dataplatform.client.dto.SendPaymentInfoRequest;
+import kr.hhplus.be.server.dataplatform.client.dto.SendPaymentInfoResponse;
 
 public interface DataPlatformApiClient {
-    ApiResponse call(ApiRequest request);
+    SendPaymentInfoResponse sendPaymentInfo(SendPaymentInfoRequest request);
 }

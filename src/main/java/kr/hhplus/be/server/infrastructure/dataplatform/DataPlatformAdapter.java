@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.infrastructure.dataplatform;
 
-import kr.hhplus.be.server.application.payment.dto.PaymentResult;
 import kr.hhplus.be.server.application.dataplatform.DataPlatformPort;
-import kr.hhplus.be.server.dataplatform.client.dto.ApiRequest;
+import kr.hhplus.be.server.application.dataplatform.dto.PaymentInfo;
 import kr.hhplus.be.server.dataplatform.client.DataPlatformApiClient;
+import kr.hhplus.be.server.dataplatform.client.dto.SendPaymentInfoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,8 +13,8 @@ public class DataPlatformAdapter implements DataPlatformPort {
     private final DataPlatformApiClient dataPlatformApiClient;
 
     @Override
-    public boolean call(PaymentResult paymentResult) {
-        ApiRequest request = new ApiRequest(paymentResult.paymentId());
-        return dataPlatformApiClient.call(request).success();
+    public boolean sendPaymentInfo(PaymentInfo paymentInfo) {
+        SendPaymentInfoRequest request = new SendPaymentInfoRequest(paymentInfo.paymentId());
+        return dataPlatformApiClient.sendPaymentInfo(request).success();
     }
 }

@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.application.dataplatform;
 
-import kr.hhplus.be.server.application.payment.dto.PaymentResult;
+import kr.hhplus.be.server.application.dataplatform.dto.PaymentInfo;
 
 public interface DataPlatformPort {
-    boolean call(PaymentResult paymentResult);
+    boolean sendPaymentInfo(PaymentInfo paymentInfo);
 }

@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.application.payment;
 
 import kr.hhplus.be.server.application.dataplatform.DataPlatformPort;
+import kr.hhplus.be.server.application.dataplatform.dto.PaymentInfo;
 import kr.hhplus.be.server.application.order.OrderFacade;
 import kr.hhplus.be.server.application.order.dto.OrderCommand;
 import kr.hhplus.be.server.application.order.dto.OrderItemCommand;
@@ -181,7 +182,7 @@ public class PaymentFacadeIntegrationTest {
             paymentFacade.pay(command);
 
             // then
-            verify(dataPlatformPort, times(1)).call(any(PaymentResult.class));
+            verify(dataPlatformPort, times(1)).sendPaymentInfo(any(PaymentInfo.class));
         }
     }
 

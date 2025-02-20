@@ -43,6 +43,9 @@ dependencies {
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
+	// Kafka
+	implementation("org.springframework.kafka:spring-kafka")
+
 	// Swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 
@@ -67,6 +70,7 @@ dependencies {
 	testImplementation ("io.rest-assured:rest-assured")
 	testImplementation ("org.instancio:instancio-junit:5.2.1")
 	testImplementation ("org.instancio:instancio-core:5.2.1")
+	testImplementation("org.springframework.kafka:spring-kafka-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

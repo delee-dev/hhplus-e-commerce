@@ -133,3 +133,12 @@ create table issued_coupons
     updated_at datetime(6)                null,
     constraint uk_issued_coupon_coupon_user unique (coupon_id, user_id)
 );
+
+CREATE TABLE payment_event_outbox
+(
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    payment_id     BIGINT                NOT NULL,
+    payload        JSON                  NOT NULL,
+    created_at     datetime              NOT NULL,
+    published      BIT(1)                NOT NULL
+);

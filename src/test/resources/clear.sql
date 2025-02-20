@@ -9,3 +9,4 @@ TRUNCATE TABLE categories;
 TRUNCATE TABLE point_histories;
 TRUNCATE TABLE points;
 TRUNCATE TABLE users;
+TRUNCATE TABLE payment_event_outbox;

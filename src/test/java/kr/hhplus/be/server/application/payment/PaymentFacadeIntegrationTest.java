@@ -1,7 +1,5 @@
 package kr.hhplus.be.server.application.payment;
 
-import kr.hhplus.be.server.application.dataplatform.DataPlatformPort;
-import kr.hhplus.be.server.application.dataplatform.dto.PaymentInfo;
 import kr.hhplus.be.server.application.order.OrderFacade;
 import kr.hhplus.be.server.application.order.dto.OrderCommand;
 import kr.hhplus.be.server.application.order.dto.OrderItemCommand;
@@ -24,6 +22,7 @@ import kr.hhplus.be.server.domain.product.model.Category;
 import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.domain.product.model.Stock;
 import kr.hhplus.be.server.domain.user.model.User;
+import kr.hhplus.be.server.event.payment.model.PaymentCompletedEvent;
 import kr.hhplus.be.server.global.exception.BusinessException;
 import kr.hhplus.be.server.infrastructure.coupon.persistence.CouponJpaRepository;
 import kr.hhplus.be.server.infrastructure.coupon.persistence.IssuedCouponJpaRepository;
@@ -43,6 +42,7 @@ import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
@@ -67,7 +67,7 @@ public class PaymentFacadeIntegrationTest {
     private PaymentFacade paymentFacade;
 
     @MockitoSpyBean
-    private DataPlatformPort dataPlatformPort;
+    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private PointFacade pointFacade;
@@ -182,7 +182,7 @@ public class PaymentFacadeIntegrationTest {
             paymentFacade.pay(command);
 
             // then
-            verify(dataPlatformPort, times(1)).sendPaymentInfo(any(PaymentInfo.class));
+            verify(eventPublisher, times(1)).publishEvent(any(PaymentCompletedEvent.class));
         }
     }
 

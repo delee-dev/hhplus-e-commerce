@@ -7,7 +7,6 @@ import kr.hhplus.be.server.application.order.OrderFacade;
 import kr.hhplus.be.server.application.order.dto.OrderCommand;
 import kr.hhplus.be.server.application.order.dto.OrderItemCommand;
 import kr.hhplus.be.server.application.point.PointFacade;
-import kr.hhplus.be.server.domain.coupon.CouponService;
 import kr.hhplus.be.server.domain.order.model.OrderStatus;
 import kr.hhplus.be.server.domain.payment.model.PaymentStatus;
 import kr.hhplus.be.server.domain.point.model.Point;
@@ -15,10 +14,6 @@ import kr.hhplus.be.server.domain.product.model.Category;
 import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.domain.product.model.Stock;
 import kr.hhplus.be.server.domain.user.model.User;
-import kr.hhplus.be.server.infrastructure.coupon.persistence.CouponJpaRepository;
-import kr.hhplus.be.server.infrastructure.coupon.persistence.IssuedCouponJpaRepository;
-import kr.hhplus.be.server.infrastructure.order.persistence.OrderJpaRepository;
-import kr.hhplus.be.server.infrastructure.payment.persistence.PaymentJpaRepository;
 import kr.hhplus.be.server.infrastructure.point.persistence.PointJpaRepository;
 import kr.hhplus.be.server.infrastructure.product.persistence.CategoryJapRepository;
 import kr.hhplus.be.server.infrastructure.product.persistence.ProductJpaRepository;
@@ -27,6 +22,7 @@ import kr.hhplus.be.server.infrastructure.user.persistence.UserJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
@@ -36,6 +32,7 @@ import static kr.hhplus.be.server.fixture.integration.Fixture.*;
 import static org.hamcrest.Matchers.equalTo;
 
 @Sql("/clear.sql")
+@EmbeddedKafka(topics = "payment-test")
 public class PaymentControllerE2ETest extends BaseE2ETest {
     @Autowired
     private PointFacade pointFacade;

@@ -22,7 +22,7 @@ import kr.hhplus.be.server.domain.product.model.Category;
 import kr.hhplus.be.server.domain.product.model.Product;
 import kr.hhplus.be.server.domain.product.model.Stock;
 import kr.hhplus.be.server.domain.user.model.User;
-import kr.hhplus.be.server.event.payment.model.PaymentCompletedEvent;
+import kr.hhplus.be.server.event.payment.outbox.PaymentEventOutboxRepository;
 import kr.hhplus.be.server.global.exception.BusinessException;
 import kr.hhplus.be.server.infrastructure.coupon.persistence.CouponJpaRepository;
 import kr.hhplus.be.server.infrastructure.coupon.persistence.IssuedCouponJpaRepository;
@@ -42,9 +42,8 @@ import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
@@ -56,18 +55,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static kr.hhplus.be.server.fixture.integration.Fixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @Sql("/clear.sql")
+@EmbeddedKafka(topics = "payment-test")
 public class PaymentFacadeIntegrationTest {
     @Autowired
     private PaymentFacade paymentFacade;
-
-    @MockitoSpyBean
-    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private PointFacade pointFacade;
@@ -94,6 +88,8 @@ public class PaymentFacadeIntegrationTest {
     private CouponJpaRepository couponJpaRepository;
     @Autowired
     private IssuedCouponJpaRepository issuedCouponJpaRepository;
+    @Autowired
+    private PaymentEventOutboxRepository paymentEventOutboxRepository;
     @Autowired
     private RedissonClient redissonClient;
 
@@ -171,7 +167,7 @@ public class PaymentFacadeIntegrationTest {
         }
 
         @Test
-        void 결제_성공_후_데이터_플랫폼으로_결제_정보가_전송된다() {
+        void 결제_성공_후_이벤트가_저장된다() {
             // given
             Long userId = 1L;
             Long orderId = 1L;
@@ -179,10 +175,26 @@ public class PaymentFacadeIntegrationTest {
             PaymentCommand command = new PaymentCommand(userId, orderId, Optional.empty());
 
             // when
-            paymentFacade.pay(command);
+            PaymentResult result = paymentFacade.pay(command);
 
             // then
-            verify(eventPublisher, times(1)).publishEvent(any(PaymentCompletedEvent.class));
+            assertThat(paymentEventOutboxRepository.findByPaymentId(result.paymentId())).isNotNull();
+        }
+
+        @Test
+        void 결제_성공_후_카프카에_이벤트가_발행된다() throws InterruptedException {
+            Long userId = 1L;
+            Long orderId = 1L;
+
+            PaymentCommand command = new PaymentCommand(userId, orderId, Optional.empty());
+
+            // when
+            PaymentResult result = paymentFacade.pay(command);
+
+            Thread.sleep(500);
+
+            // then
+            assertThat(paymentEventOutboxRepository.findByPaymentId(result.paymentId()).isPublished()).isEqualTo(true);
         }
     }
 
